@@ -71,8 +71,8 @@
     <div class="topbar">
       <h2>Projects Editor</h2>
       <div class="right small">
-        <span class="muted">API</span><input id="api" class="apiin" type="text" value="http://localhost:3000">
-        <span class="muted">Token</span><input id="tok" class="tokin" type="password" value="changeme-please">
+        <span class="muted">API</span><input id="api" class="apiin" type="text" value="http://localhost:3001">
+        <span class="muted">Token</span><input id="tok" class="tokin" type="password" value="changeme-dev-only">
         <button id="btnLoad" class="btn btn-ghost">Load</button>
         <button id="btnSaveAll" class="btn btn-ghost">Save All (from list)</button>
       </div>
@@ -170,11 +170,22 @@
   return Array.from(scope.querySelectorAll('article'));
 }
 
+    // Sanitize text to prevent XSS
+    function sanitize(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
     // Render danh sách article ra panel phải
     function renderList(){
       articleNodes = getArticles(domRoot);
       if (articleNodes.length === 0){
-        listEl.innerHTML = `<div class="muted">Chưa có project nào.</div>`;
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'muted';
+        emptyDiv.textContent = 'Chưa có project nào.';
+        listEl.innerHTML = '';
+        listEl.appendChild(emptyDiv);
         return;
       }
       listEl.innerHTML = "";
@@ -183,27 +194,65 @@
         const delay = node.getAttribute('data-aos-delay') || '0';
         const li = document.createElement('div');
         li.className = 'item';
-        li.innerHTML = `
-          <input type="checkbox" data-idx="${idx}">
-          <div style="flex:1">
-            <div class="title">${title}</div>
-            <div class="muted small">Index: ${idx} • AOS delay: ${delay}ms</div>
-          </div>
-          <span class="pill">article</span>
-        `;
+
+        // Create elements safely without innerHTML
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.dataset.idx = idx;
+
+        const contentDiv = document.createElement('div');
+        contentDiv.style.flex = '1';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'title';
+        titleDiv.textContent = title; // Safe from XSS
+
+        const metaDiv = document.createElement('div');
+        metaDiv.className = 'muted small';
+        metaDiv.textContent = `Index: ${idx} • AOS delay: ${delay}ms`;
+
+        contentDiv.appendChild(titleDiv);
+        contentDiv.appendChild(metaDiv);
+
+        const pill = document.createElement('span');
+        pill.className = 'pill';
+        pill.textContent = 'article';
+
+        li.appendChild(checkbox);
+        li.appendChild(contentDiv);
+        li.appendChild(pill);
         listEl.appendChild(li);
       });
     }
 
+    // Loading state management
+    let isLoading = false;
+    function setLoading(loading) {
+      isLoading = loading;
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(btn => btn.disabled = loading);
+    }
+
     // Gọi API lấy HTML hiện tại
     async function loadFromAPI(){
-      const url = apiInput.value.replace(/\/$/,'') + '/api/sections/projects';
-      const r = await fetch(url, { cache:'no-store' });
-      const j = await r.json();
-      rawHTML = (j && j.ok && typeof j.html === 'string') ? j.html : "";
-      domRoot = parseDOM(rawHTML);
-      renderList();
-      alert('Loaded from API!');
+      if (isLoading) return;
+      setLoading(true);
+
+      try {
+        const url = apiInput.value.replace(/\/$/,'') + '/api/sections/projects';
+        const r = await fetch(url, { cache:'no-store' });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+
+        const j = await r.json();
+        rawHTML = (j && j.ok && typeof j.html === 'string') ? j.html : "";
+        domRoot = parseDOM(rawHTML);
+        renderList();
+        alert('✅ Loaded from API!');
+      } catch(e) {
+        alert('❌ Load failed: ' + e.message);
+      } finally {
+        setLoading(false);
+      }
     }
 
     // Ghi rawHTML mới lên API
@@ -227,35 +276,55 @@
 
     // Add 1 project (append to grid nếu có; nếu không, append cuối raw HTML)
     $('#btnAdd').addEventListener('click', async ()=>{
-      // lấy dữ liệu từ form
-      const data = {
-        title: $('#title').value.trim(),
-        desc:  $('#desc').value.trim(),
-        img:   $('#img').value.trim(),
-        tags:  $('#tags').value.trim(),
-        live:  $('#live').value.trim(),
-        git:   $('#git').value.trim(),
-        delay: $('#delay').value.trim()
-      };
-      const article = buildProjectHTML(data);
+      if (isLoading) return;
+      setLoading(true);
 
-      // đảm bảo đã load
-      if (!domRoot) { domRoot = parseDOM(rawHTML); }
+      try {
+        // lấy dữ liệu từ form
+        const data = {
+          title: $('#title').value.trim(),
+          desc:  $('#desc').value.trim(),
+          img:   $('#img').value.trim(),
+          tags:  $('#tags').value.trim(),
+          live:  $('#live').value.trim(),
+          git:   $('#git').value.trim(),
+          delay: $('#delay').value.trim()
+        };
 
-      // ưu tiên chèn vào grid hiện có; nếu không có grid, append vào cuối
-      const grid = domRoot.querySelector('.grid') || domRoot;
-      const holder = document.createElement('div');
-      holder.innerHTML = article;
-      grid.appendChild(holder.firstElementChild);
+        if (!data.title) {
+          alert('⚠️ Title is required');
+          return;
+        }
 
-      const newHTML = domRoot.innerHTML;
-      try{
+        const article = buildProjectHTML(data);
+
+        // đảm bảo đã load
+        if (!domRoot) { domRoot = parseDOM(rawHTML); }
+
+        // ưu tiên chèn vào grid hiện có; nếu không có grid, append vào cuối
+        const grid = domRoot.querySelector('.grid') || domRoot;
+        const holder = document.createElement('div');
+        holder.innerHTML = article;
+        grid.appendChild(holder.firstElementChild);
+
+        const newHTML = domRoot.innerHTML;
         await saveToAPI(newHTML);
         rawHTML = newHTML;
         renderList();
         alert('✅ Added & Saved!');
+
+        // Clear form
+        $('#title').value = '';
+        $('#desc').value = '';
+        $('#img').value = '';
+        $('#tags').value = '';
+        $('#live').value = '';
+        $('#git').value = '';
+        $('#delay').value = '0';
       }catch(e){
-        alert('❌ Save error: ' + e);
+        alert('❌ Save error: ' + e.message);
+      } finally {
+        setLoading(false);
       }
     });
 
@@ -269,49 +338,63 @@
 
     // Delete selected articles
     $('#btnDelete').addEventListener('click', async ()=>{
+      if (isLoading) return;
       if (!domRoot) { alert('Chưa load dữ liệu. Bấm Load trước.'); return; }
+
       const selected = Array.from(listEl.querySelectorAll('input[type="checkbox"]:checked'))
                             .map(cb => parseInt(cb.dataset.idx,10))
                             .filter(n => !Number.isNaN(n));
       if (selected.length === 0){ alert('Chưa chọn project để xoá.'); return; }
-
       if (!confirm(`Xoá ${selected.length} project đã chọn?`)) return;
 
-      // xoá theo index giảm dần để không lệch index
-      const arts = getArticles(domRoot);
-      selected.sort((a,b)=>b-a).forEach(i => {
-        const node = arts[i];
-        if (node && node.parentNode) node.parentNode.removeChild(node);
-      });
+      setLoading(true);
+      try {
+        // xoá theo index giảm dần để không lệch index
+        const arts = getArticles(domRoot);
+        selected.sort((a,b)=>b-a).forEach(i => {
+          const node = arts[i];
+          if (node && node.parentNode) node.parentNode.removeChild(node);
+        });
 
-      const newHTML = domRoot.innerHTML;
-      try{
+        const newHTML = domRoot.innerHTML;
         await saveToAPI(newHTML);
         rawHTML = newHTML;
         renderList();
         alert('🗑️ Đã xoá & lưu thành công!');
       }catch(e){
-        alert('❌ Save error: ' + e);
+        alert('❌ Save error: ' + e.message);
+      } finally {
+        setLoading(false);
       }
     });
 
     // Save All (nếu anh chỉnh sửa danh sách bằng code khác trong tương lai)
     $('#btnSaveAll').addEventListener('click', async ()=>{
+      if (isLoading) return;
       if (!domRoot){ alert('Chưa load dữ liệu.'); return; }
+
+      setLoading(true);
       try{
         await saveToAPI(domRoot.innerHTML);
         alert('✅ Saved current DOM to API!');
-      }catch(e){ alert('❌ Save error: '+e); }
+      }catch(e){
+        alert('❌ Save error: ' + e.message);
+      } finally {
+        setLoading(false);
+      }
     });
 
     // Tự load 1 lần khi mở trang
     loadFromAPI().catch(()=>{ /* im lặng nếu API chưa chạy */ });
  async function importFromWebB() {
+  if (isLoading) return;
+
   const apiBase = document.querySelector('#api')?.value?.replace(/\/$/, '');
   const pageUrl = document.querySelector('#webb')?.value?.trim();
   if (!apiBase) { alert('Thiếu API base.'); return; }
   if (!pageUrl) { alert('Nhập Web B URL trước.'); return; }
 
+  setLoading(true);
   const proxyUrl = `${apiBase}/api/proxy/fetch?url=${encodeURIComponent(pageUrl)}`;
   const mode = "all"; // "all" = lấy toàn bộ content #projects
 
@@ -375,7 +458,9 @@
     alert('✅ Imported & saved!');
   } catch (e) {
     console.error(e);
-    alert('❌ Import error: ' + e);
+    alert('❌ Import error: ' + e.message);
+  } finally {
+    setLoading(false);
   }
 }
 document.querySelector('#btnImport')?.addEventListener('click', importFromWebB);

@@ -36,3 +36,9 @@ Thumbs.db
 dist/
 build/
 .cache/
+
+# =========================
+# Application Data
+# =========================
+sections/
+*.log
