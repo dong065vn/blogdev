@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import Blog Data to Firebase</title>
+  <style>
+    body { font-family: system-ui; background: #1a1a2e; color: #fff; padding: 40px; }
+    .container { max-width: 600px; margin: 0 auto; }
+    h1 { color: #00ffea; margin-bottom: 20px; }
+    .btn { padding: 15px 30px; font-size: 16px; cursor: pointer; border: none; border-radius: 8px; margin: 10px 5px 10px 0; }
+    .btn-primary { background: linear-gradient(135deg, #b14aed, #00b4ff); color: white; }
+    .btn-secondary { background: #333; color: #fff; border: 1px solid #555; }
+    #log { background: #0a0a14; padding: 20px; border-radius: 8px; margin-top: 20px; white-space: pre-wrap; font-family: monospace; max-height: 400px; overflow-y: auto; }
+    .success { color: #00ff88; }
+    .error { color: #ff2d75; }
+    .info { color: #00b4ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔥 Import Blog Data to Firebase</h1>
+    <p>Click button để import dữ liệu từ posts.json lên Firebase Realtime Database</p>
+    
+    <button class="btn btn-primary" onclick="importData()">📤 Import Data to Firebase</button>
+    <button class="btn btn-secondary" onclick="checkData()">🔍 Check Firebase Data</button>
+    <button class="btn btn-secondary" onclick="clearLog()">🗑️ Clear Log</button>
+    
+    <div id="log"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
+      authDomain: "dbblogdev.firebaseapp.com",
+      databaseURL: "https://dbblogdev-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "dbblogdev",
+      storageBucket: "dbblogdev.firebasestorage.app",
+      messagingSenderId: "363253081554",
+      appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    function log(msg, type = 'info') {
+      const logEl = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      logEl.innerHTML += `<span class="${type}">[${time}] ${msg}</span>\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    window.clearLog = () => {
+      document.getElementById('log').innerHTML = '';
+    };
+
+    window.importData = async () => {
+      try {
+        log('Loading posts.json...', 'info');
+        const response = await fetch('posts.json');
+        const data = await response.json();
+        const posts = data.posts || [];
+        
+        log(`Found ${posts.length} posts in JSON`, 'info');
+        
+        if (posts.length === 0) {
+          log('No posts to import!', 'error');
+          return;
+        }
+
+        // Convert array to object
+        const postsObj = {};
+        posts.forEach(post => {
+          postsObj[post.id] = post;
+          log(`  - ${post.title}`, 'info');
+        });
+
+        log('Uploading to Firebase...', 'info');
+        await set(ref(database, 'posts'), postsObj);
+        
+        log(`✅ SUCCESS! Imported ${posts.length} posts to Firebase!`, 'success');
+        log('You can now refresh Blog Admin and Portfolio pages.', 'success');
+        
+      } catch (error) {
+        log(`❌ ERROR: ${error.message}`, 'error');
+        console.error(error);
+      }
+    };
+
+    window.checkData = async () => {
+      try {
+        log('Checking Firebase data...', 'info');
+        const snapshot = await get(ref(database, 'posts'));
+        
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const posts = Object.values(data);
+          log(`✅ Found ${posts.length} posts in Firebase:`, 'success');
+          posts.forEach(p => log(`  - ${p.title} (${p.category})`, 'info'));
+        } else {
+          log('⚠️ No data in Firebase yet', 'error');
+        }
+      } catch (error) {
+        log(`❌ ERROR: ${error.message}`, 'error');
+        console.error(error);
+      }
+    };
+
+    // Auto check on load
+    log('Firebase initialized. Ready to import!', 'success');
+  </script>
+</body>
+</html>
