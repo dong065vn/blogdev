@@ -295,9 +295,76 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="../js/firebase-config.js"></script>
 <script type="module">
-// Blog Admin App - Firebase Realtime Database
+// Import Firebase directly
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getDatabase, ref, get, set, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
+  authDomain: "dbblogdev.firebaseapp.com",
+  databaseURL: "https://dbblogdev-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "dbblogdev",
+  storageBucket: "dbblogdev.firebasestorage.app",
+  messagingSenderId: "363253081554",
+  appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const auth = getAuth(app);
+
+// Blog API functions
+const BlogAPI = {
+  async getPosts() {
+    try {
+      const snapshot = await get(ref(database, 'posts'));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        return Object.values(data).sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
+      return [];
+    } catch (error) {
+      console.error('Error loading posts:', error);
+      return null;
+    }
+  },
+  
+  async savePost(post) {
+    try {
+      await set(ref(database, `posts/${post.id}`), post);
+      return true;
+    } catch (error) {
+      console.error('Error saving post:', error);
+      return false;
+    }
+  },
+  
+  async deletePost(postId) {
+    try {
+      await remove(ref(database, `posts/${postId}`));
+      return true;
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      return false;
+    }
+  },
+  
+  async saveAllPosts(posts) {
+    try {
+      const postsObj = {};
+      posts.forEach(post => { postsObj[post.id] = post; });
+      await set(ref(database, 'posts'), postsObj);
+      return true;
+    } catch (error) {
+      console.error('Error saving posts:', error);
+      return false;
+    }
+  }
+};
+
+// Blog Admin App
 const App = {
   posts: [],
   currentPost: null,
@@ -327,13 +394,11 @@ const App = {
       // Try Firebase first
       let firebasePosts = null;
       try {
-        if (window.BlogAPI) {
-          firebasePosts = await window.BlogAPI.getPosts();
-          if (firebasePosts && firebasePosts.length > 0) {
-            this.posts = firebasePosts;
-            console.log('Loaded posts from Firebase:', firebasePosts.length);
-            return;
-          }
+        firebasePosts = await BlogAPI.getPosts();
+        if (firebasePosts && firebasePosts.length > 0) {
+          this.posts = firebasePosts;
+          console.log('Loaded posts from Firebase:', firebasePosts.length);
+          return;
         }
       } catch (fbError) {
         console.warn('Firebase error:', fbError.message);
@@ -347,8 +412,8 @@ const App = {
       console.log('Loaded posts from local JSON:', this.posts.length);
       
       // Sync to Firebase in background
-      if (this.posts.length > 0 && window.BlogAPI) {
-        window.BlogAPI.saveAllPosts(this.posts).then(ok => {
+      if (this.posts.length > 0) {
+        BlogAPI.saveAllPosts(this.posts).then(ok => {
           if (ok) {
             console.log('Synced local posts to Firebase');
             this.toast('Đã đồng bộ dữ liệu lên Firebase!', 'success');
@@ -560,7 +625,7 @@ const App = {
 
     // Save to Firebase
     this.loading = true;
-    const saved = await window.BlogAPI.savePost(post);
+    const saved = await BlogAPI.savePost(post);
     
     if (saved) {
       if (this.editMode) {
@@ -602,7 +667,7 @@ const App = {
 
   async deletePost() {
     // Delete from Firebase
-    const deleted = await window.BlogAPI.deletePost(this.deleteId);
+    const deleted = await BlogAPI.deletePost(this.deleteId);
     
     if (deleted) {
       this.posts = this.posts.filter(p => p.id !== this.deleteId);
@@ -667,22 +732,6 @@ const App = {
   }
 };
 
-// Firebase Auth Check
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
-  authDomain: "dbblogdev.firebaseapp.com",
-  projectId: "dbblogdev",
-  storageBucket: "dbblogdev.firebasestorage.app",
-  messagingSenderId: "363253081554",
-  appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-
 // Check auth state before init
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -691,4 +740,7 @@ onAuthStateChanged(auth, (user) => {
     window.location.href = '../admin/auth.html';
   }
 });
+
+// Make App global for onclick handlers
+window.App = App;
 </script>
