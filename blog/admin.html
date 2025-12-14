@@ -331,10 +331,13 @@ const BlogAPI = {
   
   async savePost(post) {
     try {
+      console.log('Saving post to Firebase:', post.id, post.title);
       await set(ref(database, `posts/${post.id}`), post);
+      console.log('Post saved successfully!');
       return true;
     } catch (error) {
       console.error('Error saving post:', error);
+      alert('Firebase Error: ' + error.message);
       return false;
     }
   },
