@@ -330,13 +330,20 @@ const BlogAPI = {
   },
   
   async savePost(post) {
+    console.log('=== SAVING POST ===');
+    console.log('Post ID:', post.id);
+    console.log('Post Title:', post.title);
+    console.log('Database ref:', database);
     try {
-      console.log('Saving post to Firebase:', post.id, post.title);
-      await set(ref(database, `posts/${post.id}`), post);
-      console.log('Post saved successfully!');
+      const postRef = ref(database, `posts/${post.id}`);
+      console.log('Post ref created:', postRef.toString());
+      await set(postRef, post);
+      console.log('✅ Post saved successfully to Firebase!');
       return true;
     } catch (error) {
-      console.error('Error saving post:', error);
+      console.error('❌ Error saving post:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       alert('Firebase Error: ' + error.message);
       return false;
     }
