@@ -324,32 +324,36 @@ const App = {
 
   async loadPosts() {
     try {
-      // Try Firebase first with timeout
-      let posts = null;
+      // Try Firebase first
+      let firebasePosts = null;
       try {
         if (window.BlogAPI) {
-          posts = await window.BlogAPI.getPosts();
-          if (posts && posts.length > 0) {
-            this.posts = posts;
-            console.log('Loaded posts from Firebase:', posts.length);
+          firebasePosts = await window.BlogAPI.getPosts();
+          if (firebasePosts && firebasePosts.length > 0) {
+            this.posts = firebasePosts;
+            console.log('Loaded posts from Firebase:', firebasePosts.length);
             return;
           }
         }
       } catch (fbError) {
-        console.warn('Firebase error, using fallback:', fbError.message);
+        console.warn('Firebase error:', fbError.message);
       }
       
-      // Fallback to local JSON
+      // Fallback to local JSON (Firebase empty or failed)
+      console.log('Firebase empty or failed, loading from JSON...');
       const res = await fetch('posts.json');
       const data = await res.json();
       this.posts = data.posts || [];
       console.log('Loaded posts from local JSON:', this.posts.length);
       
-      // Try to sync to Firebase in background (don't wait)
+      // Sync to Firebase in background
       if (this.posts.length > 0 && window.BlogAPI) {
         window.BlogAPI.saveAllPosts(this.posts).then(ok => {
-          if (ok) console.log('Synced local posts to Firebase');
-        }).catch(() => {});
+          if (ok) {
+            console.log('Synced local posts to Firebase');
+            this.toast('Đã đồng bộ dữ liệu lên Firebase!', 'success');
+          }
+        }).catch(err => console.error('Sync error:', err));
       }
     } catch (e) {
       console.error('Error loading posts:', e);

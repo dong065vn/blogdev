@@ -1754,12 +1754,21 @@
         // Try Firebase first
         let posts = null;
         if (window.BlogAPI) {
-          posts = await window.BlogAPI.getPosts();
-          if (posts) console.log('Blog loaded from Firebase:', posts.length);
+          try {
+            posts = await window.BlogAPI.getPosts();
+            if (posts && posts.length > 0) {
+              console.log('Blog loaded from Firebase:', posts.length);
+            } else {
+              posts = null; // Force fallback if empty
+            }
+          } catch (fbErr) {
+            console.warn('Firebase error:', fbErr);
+            posts = null;
+          }
         }
         
-        // Fallback to local JSON
-        if (!posts) {
+        // Fallback to local JSON if Firebase failed or returned empty
+        if (!posts || posts.length === 0) {
           const response = await fetch('blog/posts.json');
           const data = await response.json();
           posts = data.posts || [];
