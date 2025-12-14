@@ -324,23 +324,32 @@ const App = {
 
   async loadPosts() {
     try {
-      // Load from Firebase first
-      const posts = await window.BlogAPI.getPosts();
-      if (posts && posts.length > 0) {
-        this.posts = posts;
-        console.log('Loaded posts from Firebase:', posts.length);
-      } else {
-        // Fallback to local JSON
-        const res = await fetch('posts.json');
-        const data = await res.json();
-        this.posts = data.posts || [];
-        console.log('Loaded posts from local JSON:', this.posts.length);
-        
-        // Sync to Firebase if we have local posts
-        if (this.posts.length > 0) {
-          await window.BlogAPI.saveAllPosts(this.posts);
-          console.log('Synced local posts to Firebase');
+      // Try Firebase first with timeout
+      let posts = null;
+      try {
+        if (window.BlogAPI) {
+          posts = await window.BlogAPI.getPosts();
+          if (posts && posts.length > 0) {
+            this.posts = posts;
+            console.log('Loaded posts from Firebase:', posts.length);
+            return;
+          }
         }
+      } catch (fbError) {
+        console.warn('Firebase error, using fallback:', fbError.message);
+      }
+      
+      // Fallback to local JSON
+      const res = await fetch('posts.json');
+      const data = await res.json();
+      this.posts = data.posts || [];
+      console.log('Loaded posts from local JSON:', this.posts.length);
+      
+      // Try to sync to Firebase in background (don't wait)
+      if (this.posts.length > 0 && window.BlogAPI) {
+        window.BlogAPI.saveAllPosts(this.posts).then(ok => {
+          if (ok) console.log('Synced local posts to Firebase');
+        }).catch(() => {});
       }
     } catch (e) {
       console.error('Error loading posts:', e);

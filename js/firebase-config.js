@@ -41,26 +41,34 @@ async function initFirebase() {
 
 // Blog Posts API - Realtime Database
 const BlogAPI = {
-  // Load all posts
+  // Load all posts with timeout
   async getPosts() {
     try {
-      const { getDatabase, ref, get } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
-      const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Firebase timeout')), 5000)
+      );
       
-      let app = getApps()[0];
-      if (!app) app = initializeApp(firebaseConfig);
-      const database = getDatabase(app);
+      const fetchPromise = (async () => {
+        const { getDatabase, ref, get } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+        const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+        
+        let app = getApps()[0];
+        if (!app) app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        const snapshot = await get(ref(database, 'posts'));
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const posts = Object.values(data).sort((a, b) => new Date(b.date) - new Date(a.date));
+          return posts;
+        }
+        return [];
+      })();
       
-      const snapshot = await get(ref(database, 'posts'));
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        // Convert object to array and sort by date
-        const posts = Object.values(data).sort((a, b) => new Date(b.date) - new Date(a.date));
-        return posts;
-      }
-      return [];
+      return await Promise.race([fetchPromise, timeoutPromise]);
     } catch (error) {
-      console.error('Error loading posts:', error);
+      console.error('Error loading posts from Firebase:', error.message);
       return null; // Return null to trigger fallback
     }
   },
