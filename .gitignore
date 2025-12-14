@@ -2,43 +2,44 @@
 # Node.js
 # =========================
 node_modules/
-cms-api/node_modules/
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# lock file khác (nếu dùng)
 pnpm-lock.yaml
 
 # =========================
-# Env / Secrets
+# Environment / Secrets
 # =========================
 .env
 .env.local
-.env.development.local
-.env.production.local
-.env.test.local
+.env*.local
 
 # =========================
-# OS / IDE
+# OS Generated
 # =========================
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# VSCode / editor
-.vscode/
+# =========================
+# IDE / Editor
+# =========================
 .idea/
 
 # =========================
-# Build / Cache (nếu có)
+# Build / Cache
 # =========================
 dist/
 build/
 .cache/
 
 # =========================
-# Application Data
+# Logs
 # =========================
-sections/
 *.log
+logs/
+
+# =========================
+# Vercel
+# =========================
+.vercel
