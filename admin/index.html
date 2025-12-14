@@ -12,20 +12,15 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="../js/security.js"></script>
-  <script>
-    // Auth check - redirect if not authenticated
-    (function() {
-      const token = sessionStorage.getItem('admin_token');
-      const expires = sessionStorage.getItem('admin_expires');
-      if (!token || !expires || Date.now() > parseInt(expires)) {
-        sessionStorage.removeItem('admin_token');
-        sessionStorage.removeItem('admin_expires');
-        window.location.href = 'auth.html';
-      }
-    })();
-  </script>
 </head>
 <body>
+  <!-- Loading overlay while checking auth -->
+  <div id="authLoading" style="position:fixed;inset:0;background:#0a0a14;display:flex;align-items:center;justify-content:center;z-index:9999;">
+    <div style="text-align:center;color:#f5f5ff;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;margin-bottom:16px;display:block;"></i>
+      <p>Đang xác thực...</p>
+    </div>
+  </div>
   <div class="mesh-bg"></div>
   <div class="admin-wrapper">
     <aside class="sidebar" id="sidebar">
@@ -243,7 +238,7 @@ a { color: inherit; text-decoration: none; }
 }
 </style>
 
-<script>
+<script type="module">
 // Portfolio Config Data
 const defaultConfig = {
   profile: {
@@ -718,5 +713,42 @@ const App = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => App.init());
+// Firebase Auth Check
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
+  authDomain: "dbblogdev.firebaseapp.com",
+  projectId: "dbblogdev",
+  storageBucket: "dbblogdev.firebasestorage.app",
+  messagingSenderId: "363253081554",
+  appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+
+// Check auth state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, hide loading and init app
+    document.getElementById('authLoading').style.display = 'none';
+    App.currentUser = user;
+    App.init();
+  } else {
+    // Not signed in, redirect to login
+    window.location.href = 'auth.html';
+  }
+});
+
+// Override logout method
+App.logout = async function() {
+  try {
+    await signOut(auth);
+    window.location.href = 'auth.html';
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+};
 </script>

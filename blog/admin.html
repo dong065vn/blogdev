@@ -11,16 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="../js/security.js"></script>
-  <script>
-    // Auth check
-    (function() {
-      const token = sessionStorage.getItem('admin_token');
-      const expires = sessionStorage.getItem('admin_expires');
-      if (!token || !expires || Date.now() > parseInt(expires)) {
-        window.location.href = '../admin/auth.html';
-      }
-    })();
-  </script>
   <style>
     :root {
       --bg-dark: #0a0a14;
@@ -305,7 +295,7 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script>
+<script type="module">
 // Blog Admin App
 const App = {
   posts: [],
@@ -613,6 +603,28 @@ const App = {
   }
 };
 
-// Init
-document.addEventListener('DOMContentLoaded', () => App.init());
+// Firebase Auth Check
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
+  authDomain: "dbblogdev.firebaseapp.com",
+  projectId: "dbblogdev",
+  storageBucket: "dbblogdev.firebasestorage.app",
+  messagingSenderId: "363253081554",
+  appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+
+// Check auth state before init
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    App.init();
+  } else {
+    window.location.href = '../admin/auth.html';
+  }
+});
 </script>

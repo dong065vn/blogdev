@@ -33,7 +33,7 @@
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius);
-      padding: 48px; width: 100%; max-width: 400px;
+      padding: 48px; width: 100%; max-width: 420px;
       text-align: center;
     }
     .login-icon {
@@ -67,80 +67,137 @@
     }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(177, 74, 237, 0.4); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .error { color: var(--neon-pink); font-size: 0.85rem; margin-top: 16px; display: none; }
-    .error.show { display: block; }
+    .message { font-size: 0.85rem; margin-top: 16px; display: none; padding: 12px; border-radius: 8px; }
+    .message.error { display: block; background: rgba(255, 45, 117, 0.1); color: var(--neon-pink); }
+    .message.success { display: block; background: rgba(0, 255, 234, 0.1); color: #00ffea; }
+    .message.info { display: block; background: rgba(177, 74, 237, 0.1); color: var(--neon-purple); }
     .back-link {
       display: inline-block; margin-top: 24px;
       color: var(--text-secondary); font-size: 0.9rem;
-      transition: color 0.3s;
+      text-decoration: none; transition: color 0.3s;
     }
     .back-link:hover { color: var(--text-primary); }
+    .divider { margin: 24px 0; color: var(--text-secondary); font-size: 0.85rem; }
+    .forgot-link { color: var(--neon-purple); font-size: 0.85rem; cursor: pointer; }
+    .forgot-link:hover { text-decoration: underline; }
+    .loading { display: none; }
+    .loading.show { display: block; }
   </style>
 </head>
 <body>
   <div class="mesh-bg"></div>
   <div class="login-card">
-    <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
+    <div class="login-icon"><i class="fa-solid fa-shield-halved"></i></div>
     <h1>Admin Access</h1>
-    <p>Nhập mật khẩu để truy cập trang quản trị</p>
+    <p>Đăng nhập bằng tài khoản Firebase</p>
+    
     <form id="loginForm">
       <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="email" placeholder="admin@example.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
         <label class="form-label">Mật khẩu</label>
-        <input type="password" class="form-input" id="password" placeholder="••••••••" required autocomplete="off">
+        <input type="password" class="form-input" id="password" placeholder="••••••••" required autocomplete="current-password">
       </div>
       <button type="submit" class="btn" id="submitBtn">
         <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
       </button>
-      <p class="error" id="errorMsg">Mật khẩu không đúng. Vui lòng thử lại.</p>
+      <div class="message" id="message"></div>
     </form>
+    
+    <div class="divider">─────────</div>
+    <span class="forgot-link" onclick="resetPassword()">Quên mật khẩu?</span>
+    
     <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Về trang chủ</a>
   </div>
-  <script src="../js/security.js"></script>
-  <script>
-    // Default password - CHANGE THIS for production!
-    // Mật khẩu mặc định: dongdev2024
-    const VALID_PASSWORD = 'dongdev2024';
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
+      authDomain: "dbblogdev.firebaseapp.com",
+      projectId: "dbblogdev",
+      storageBucket: "dbblogdev.firebasestorage.app",
+      messagingSenderId: "363253081554",
+      appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Check if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = 'index.html';
+      }
+    });
 
     const form = document.getElementById('loginForm');
-    const errorMsg = document.getElementById('errorMsg');
+    const message = document.getElementById('message');
     const submitBtn = document.getElementById('submitBtn');
-    let attempts = 0;
-    const maxAttempts = 5;
 
-    form.addEventListener('submit', (e) => {
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = 'message ' + type;
+    }
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      if (attempts >= maxAttempts) {
-        errorMsg.textContent = 'Quá nhiều lần thử. Vui lòng đợi 1 phút.';
-        errorMsg.classList.add('show');
-        return;
-      }
-
+      const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
+      
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xác thực...';
+      message.className = 'message';
 
-      // Check password
-      if (password === VALID_PASSWORD) {
-        // Set session token
-        const token = btoa(Date.now() + '_' + Math.random().toString(36));
-        sessionStorage.setItem('admin_token', token);
-        sessionStorage.setItem('admin_expires', Date.now() + 3600000); // 1 hour
-        
-        window.location.href = 'index.html';
-      } else {
-        attempts++;
-        errorMsg.textContent = `Mật khẩu không đúng. Còn ${maxAttempts - attempts} lần thử.`;
-        errorMsg.classList.add('show');
-        
-        if (attempts >= maxAttempts) {
-          setTimeout(() => { attempts = 0; }, 60000);
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        showMessage('Đăng nhập thành công! Đang chuyển hướng...', 'success');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+      } catch (error) {
+        let errorText = 'Đăng nhập thất bại.';
+        switch (error.code) {
+          case 'auth/user-not-found':
+            errorText = 'Email không tồn tại trong hệ thống.';
+            break;
+          case 'auth/wrong-password':
+          case 'auth/invalid-credential':
+            errorText = 'Email hoặc mật khẩu không đúng.';
+            break;
+          case 'auth/too-many-requests':
+            errorText = 'Quá nhiều lần thử. Vui lòng đợi vài phút.';
+            break;
+          case 'auth/invalid-email':
+            errorText = 'Email không hợp lệ.';
+            break;
         }
-        
+        showMessage(errorText, 'error');
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Đăng nhập';
       }
     });
+
+    // Reset password function
+    window.resetPassword = async function() {
+      const email = document.getElementById('email').value;
+      if (!email) {
+        showMessage('Vui lòng nhập email trước.', 'info');
+        return;
+      }
+      
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showMessage('Email đặt lại mật khẩu đã được gửi!', 'success');
+      } catch (error) {
+        showMessage('Không thể gửi email. Kiểm tra lại địa chỉ email.', 'error');
+      }
+    };
   </script>
 </body>
 </html>
