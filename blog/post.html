@@ -331,7 +331,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="../js/security.js"></script>
   <script type="module">
     // Get post ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -438,7 +437,7 @@
             ${contentHtml}
             
             <div class="article-tags">
-              ${post.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+              ${(post.tags || []).map(tag => `<span class="tag">#${tag}</span>`).join('')}
             </div>
 
             <div class="article-share">
