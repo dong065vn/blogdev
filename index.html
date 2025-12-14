@@ -1575,6 +1575,8 @@
 
   <a href="#hero" class="back-to-top" id="backToTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
 
+  <!-- Firebase Config for Blog -->
+  <script src="js/firebase-config.js"></script>
   <script>
     // Mobile Menu
     const menuToggle = document.getElementById('menuToggle');
@@ -1678,20 +1680,28 @@
       });
     }
 
-    // Load Blog Posts from JSON
+    // Load Blog Posts from Firebase (with JSON fallback)
     async function loadBlogPosts() {
       const blogGrid = document.getElementById('blogGrid');
-      try {
-        const response = await fetch('blog/posts.json');
-        const data = await response.json();
+      
+      const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      };
+      
+      const renderPosts = (posts) => {
+        if (!posts || posts.length === 0) {
+          blogGrid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-muted);">
+              <i class="fa-solid fa-newspaper" style="font-size: 2rem; margin-bottom: 16px; display: block;"></i>
+              Chưa có bài viết nào.
+            </div>
+          `;
+          return;
+        }
         
-        const formatDate = (dateStr) => {
-          const date = new Date(dateStr);
-          return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        };
-
         let html = '';
-        data.posts.forEach((post, index) => {
+        posts.forEach((post, index) => {
           const isFeatured = post.featured && index === 0;
           html += `
             <article class="blog-card ${isFeatured ? 'blog-featured' : ''}">
@@ -1738,6 +1748,25 @@
             card.style.boxShadow = '';
           });
         });
+      };
+      
+      try {
+        // Try Firebase first
+        let posts = null;
+        if (window.BlogAPI) {
+          posts = await window.BlogAPI.getPosts();
+          if (posts) console.log('Blog loaded from Firebase:', posts.length);
+        }
+        
+        // Fallback to local JSON
+        if (!posts) {
+          const response = await fetch('blog/posts.json');
+          const data = await response.json();
+          posts = data.posts || [];
+          console.log('Blog loaded from local JSON:', posts.length);
+        }
+        
+        renderPosts(posts);
       } catch (error) {
         console.error('Error loading blog posts:', error);
         blogGrid.innerHTML = `

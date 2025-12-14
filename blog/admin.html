@@ -295,25 +295,55 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="../js/firebase-config.js"></script>
 <script type="module">
-// Blog Admin App
+// Blog Admin App - Firebase Realtime Database
 const App = {
   posts: [],
   currentPost: null,
   editMode: false,
+  loading: false,
 
   async init() {
+    this.showLoading('Đang tải bài viết...');
     await this.loadPosts();
     this.render();
     this.bindEvents();
   },
 
+  showLoading(msg) {
+    document.getElementById('appContainer').innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; min-height: 400px; color: var(--text-muted);">
+        <div style="text-align: center;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 16px;"></i>
+          <p>${msg}</p>
+        </div>
+      </div>
+    `;
+  },
+
   async loadPosts() {
     try {
-      const res = await fetch('posts.json');
-      const data = await res.json();
-      this.posts = data.posts || [];
+      // Load from Firebase first
+      const posts = await window.BlogAPI.getPosts();
+      if (posts && posts.length > 0) {
+        this.posts = posts;
+        console.log('Loaded posts from Firebase:', posts.length);
+      } else {
+        // Fallback to local JSON
+        const res = await fetch('posts.json');
+        const data = await res.json();
+        this.posts = data.posts || [];
+        console.log('Loaded posts from local JSON:', this.posts.length);
+        
+        // Sync to Firebase if we have local posts
+        if (this.posts.length > 0) {
+          await window.BlogAPI.saveAllPosts(this.posts);
+          console.log('Synced local posts to Firebase');
+        }
+      }
     } catch (e) {
+      console.error('Error loading posts:', e);
       this.posts = [];
     }
   },
@@ -489,7 +519,9 @@ const App = {
     return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   },
 
-  savePost() {
+  async savePost() {
+    if (this.loading) return;
+    
     const title = document.getElementById('title').value.trim();
     const category = document.getElementById('category').value;
     const excerpt = document.getElementById('excerpt').value.trim();
@@ -513,16 +545,23 @@ const App = {
       readTime, featured
     };
 
-    if (this.editMode) {
-      const idx = this.posts.findIndex(p => p.id === this.currentPost.id);
-      if (idx !== -1) this.posts[idx] = post;
+    // Save to Firebase
+    this.loading = true;
+    const saved = await window.BlogAPI.savePost(post);
+    
+    if (saved) {
+      if (this.editMode) {
+        const idx = this.posts.findIndex(p => p.id === this.currentPost.id);
+        if (idx !== -1) this.posts[idx] = post;
+      } else {
+        this.posts.unshift(post);
+      }
+      this.toast(this.editMode ? 'Đã cập nhật bài viết!' : 'Đã lưu bài viết mới!', 'success');
+      this.newPost();
     } else {
-      this.posts.unshift(post);
+      this.toast('Lỗi khi lưu bài viết. Vui lòng thử lại.', 'error');
     }
-
-    this.saveToStorage();
-    this.toast(this.editMode ? 'Đã cập nhật bài viết!' : 'Đã lưu bài viết mới!', 'success');
-    this.newPost();
+    this.loading = false;
   },
 
   editPost(id) {
@@ -548,13 +587,20 @@ const App = {
     document.getElementById('btnConfirmDelete').onclick = () => this.deletePost();
   },
 
-  deletePost() {
-    this.posts = this.posts.filter(p => p.id !== this.deleteId);
-    this.saveToStorage();
-    this.closeModal();
-    this.toast('Đã xóa bài viết', 'success');
-    if (this.currentPost?.id === this.deleteId) this.newPost();
-    else this.render(), this.bindEvents();
+  async deletePost() {
+    // Delete from Firebase
+    const deleted = await window.BlogAPI.deletePost(this.deleteId);
+    
+    if (deleted) {
+      this.posts = this.posts.filter(p => p.id !== this.deleteId);
+      this.closeModal();
+      this.toast('Đã xóa bài viết', 'success');
+      if (this.currentPost?.id === this.deleteId) this.newPost();
+      else this.render(), this.bindEvents();
+    } else {
+      this.closeModal();
+      this.toast('Lỗi khi xóa bài viết', 'error');
+    }
   },
 
   closeModal() {
@@ -572,8 +618,13 @@ const App = {
     document.getElementById('previewModal').classList.remove('active');
   },
 
-  saveToStorage() {
-    localStorage.setItem('blog_posts', JSON.stringify({ posts: this.posts }));
+  async syncToFirebase() {
+    const saved = await window.BlogAPI.saveAllPosts(this.posts);
+    if (saved) {
+      this.toast('Đã đồng bộ lên Firebase!', 'success');
+    } else {
+      this.toast('Lỗi đồng bộ Firebase', 'error');
+    }
   },
 
   exportJSON() {

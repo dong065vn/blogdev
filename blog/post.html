@@ -332,6 +332,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="../js/firebase-config.js"></script>
   <script>
     // Get post ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -340,9 +341,19 @@
     // Load and render post
     async function loadPost() {
       try {
-        const response = await fetch('posts.json');
-        const data = await response.json();
-        const post = data.posts.find(p => p.id === postId);
+        // Try Firebase first, fallback to local JSON
+        let posts = null;
+        if (window.BlogAPI) {
+          posts = await window.BlogAPI.getPosts();
+        }
+        
+        if (!posts) {
+          const response = await fetch('posts.json');
+          const data = await response.json();
+          posts = data.posts;
+        }
+        
+        const post = posts.find(p => p.id === postId);
 
         if (!post) {
           document.getElementById('article').innerHTML = `
@@ -361,7 +372,7 @@
         document.title = `${post.title} - Đông Dev`;
 
         // Get related posts (same category, exclude current)
-        const relatedPosts = data.posts
+        const relatedPosts = posts
           .filter(p => p.id !== post.id)
           .slice(0, 3);
 
