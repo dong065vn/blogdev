@@ -7,7 +7,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
   authDomain: "dbblogdev.firebaseapp.com",
-  databaseURL: "https://dbblogdev-default-rtdb.firebaseio.com",
+  databaseURL: "https://dbblogdev-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "dbblogdev",
   storageBucket: "dbblogdev.firebasestorage.app",
   messagingSenderId: "363253081554",
