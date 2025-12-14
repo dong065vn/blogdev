@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -726,29 +726,59 @@ const firebaseConfig = {
   appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
+let firebaseApp, auth;
+try {
+  firebaseApp = initializeApp(firebaseConfig);
+  auth = getAuth(firebaseApp);
+} catch (error) {
+  console.error('Firebase init error:', error);
+  document.getElementById('authLoading').innerHTML = `
+    <div style="text-align:center;color:#ff2d75;">
+      <i class="fa-solid fa-exclamation-triangle" style="font-size:2rem;margin-bottom:16px;display:block;"></i>
+      <p>Lỗi kết nối Firebase</p>
+      <p style="font-size:0.85rem;opacity:0.7;margin-top:8px;">${error.message}</p>
+      <a href="auth.html" style="color:#00ffea;margin-top:16px;display:inline-block;">Thử đăng nhập lại</a>
+    </div>
+  `;
+}
+
+// Timeout after 10 seconds
+setTimeout(() => {
+  const loading = document.getElementById('authLoading');
+  if (loading && loading.style.display !== 'none') {
+    loading.innerHTML = `
+      <div style="text-align:center;color:#fbbf24;">
+        <i class="fa-solid fa-clock" style="font-size:2rem;margin-bottom:16px;display:block;"></i>
+        <p>Kết nối chậm hoặc chưa bật Firebase Auth</p>
+        <a href="auth.html" style="color:#00ffea;margin-top:16px;display:inline-block;">Đi đến trang đăng nhập</a>
+      </div>
+    `;
+  }
+}, 10000);
 
 // Check auth state
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is signed in, hide loading and init app
-    document.getElementById('authLoading').style.display = 'none';
-    App.currentUser = user;
-    App.init();
-  } else {
-    // Not signed in, redirect to login
-    window.location.href = 'auth.html';
-  }
-});
+if (auth) {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User is signed in, hide loading and init app
+      document.getElementById('authLoading').style.display = 'none';
+      App.currentUser = user;
+      App.init();
+    } else {
+      // Not signed in, redirect to login
+      window.location.href = 'auth.html';
+    }
+  });
+}
 
 // Override logout method
 App.logout = async function() {
   try {
-    await signOut(auth);
+    if (auth) await signOut(auth);
     window.location.href = 'auth.html';
   } catch (error) {
     console.error('Logout error:', error);
+    window.location.href = 'auth.html';
   }
 };
 </script>
