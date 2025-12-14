@@ -697,7 +697,7 @@ const App = {
   },
 
   async syncToFirebase() {
-    const saved = await window.BlogAPI.saveAllPosts(this.posts);
+    const saved = await BlogAPI.saveAllPosts(this.posts);
     if (saved) {
       this.toast('Đã đồng bộ lên Firebase!', 'success');
     } else {
@@ -732,6 +732,9 @@ const App = {
   }
 };
 
+// Make App global for onclick handlers FIRST
+window.App = App;
+
 // Check auth state before init
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -740,7 +743,4 @@ onAuthStateChanged(auth, (user) => {
     window.location.href = '../admin/auth.html';
   }
 });
-
-// Make App global for onclick handlers
-window.App = App;
 </script>
