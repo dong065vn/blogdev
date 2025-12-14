@@ -118,6 +118,7 @@
     .author-avatar {
       width: 40px; height: 40px; border-radius: 50%;
       border: 2px solid rgba(255, 255, 255, 0.1);
+      object-fit: cover; object-position: center 20%; /* Focus khuôn mặt */
     }
 
     /* Featured Image */
@@ -128,8 +129,17 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     }
     .article-image img {
-      width: 100%; height: 100%; object-fit: cover;
+      width: 100%; height: 100%; object-fit: cover; object-position: center center;
     }
+    /* Ảnh có người - focus phần trên */
+    .article-image.has-person img { object-position: center 25%; }
+    .article-image.has-face img { object-position: center 15%; }
+    
+    /* Image Focus Utilities */
+    .img-focus-face { object-position: center 20% !important; }
+    .img-focus-top { object-position: center top !important; }
+    .img-focus-center { object-position: center center !important; }
+    .img-focus-portrait { object-position: center 30% !important; }
 
     /* Content */
     .article-content {
@@ -249,8 +259,10 @@
       border-color: rgba(255, 255, 255, 0.15);
     }
     .related-card img {
-      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      width: 100%; aspect-ratio: 16/9; object-fit: cover; object-position: center center;
     }
+    .related-card.has-person img { object-position: center 25%; }
+    .related-card.has-face img { object-position: center 15%; }
     .related-card-content {
       padding: 20px;
     }
