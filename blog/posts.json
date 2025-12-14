@@ -1,0 +1,60 @@
+{
+  "posts": [
+    {
+      "id": "scalable-web-apps",
+      "title": "Building Scalable Web Applications with Modern Architecture",
+      "slug": "building-scalable-web-applications",
+      "excerpt": "Learn how to design and implement scalable web applications using microservices, containerization, and cloud-native technologies.",
+      "content": "## Introduction\n\nBuilding scalable web applications is crucial in today's digital landscape. In this article, we'll explore modern architecture patterns that help your applications grow seamlessly.\n\n## Key Concepts\n\n### 1. Microservices Architecture\n\nBreaking down your application into smaller, independent services allows for:\n- Independent deployment\n- Technology flexibility\n- Better fault isolation\n- Easier scaling\n\n### 2. Containerization with Docker\n\nContainers provide consistent environments across development and production:\n\n```dockerfile\nFROM node:18-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --only=production\nCOPY . .\nEXPOSE 3000\nCMD [\"node\", \"server.js\"]\n```\n\n### 3. Cloud-Native Patterns\n\n- **Service Discovery**: Automatic detection of services\n- **Load Balancing**: Distribute traffic efficiently\n- **Circuit Breakers**: Prevent cascade failures\n\n## Best Practices\n\n1. Design for failure\n2. Implement proper logging and monitoring\n3. Use caching strategically\n4. Automate everything\n\n## Conclusion\n\nModern architecture isn't just about technology—it's about building systems that can evolve with your business needs.",
+      "category": "Architecture",
+      "tags": ["microservices", "docker", "cloud", "scalability"],
+      "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format",
+      "author": "Đông Dev",
+      "date": "2024-12-10",
+      "readTime": 8,
+      "featured": true
+    },
+    {
+      "id": "react-hooks-guide",
+      "title": "Mastering React Hooks: A Complete Guide",
+      "slug": "mastering-react-hooks",
+      "excerpt": "Deep dive into React Hooks including useState, useEffect, useContext, and custom hooks with practical examples.",
+      "content": "## What are React Hooks?\n\nHooks are functions that let you use state and other React features without writing a class.\n\n## Essential Hooks\n\n### useState\n\nManage local state in functional components:\n\n```javascript\nconst [count, setCount] = useState(0);\n\nconst increment = () => setCount(prev => prev + 1);\n```\n\n### useEffect\n\nHandle side effects like data fetching:\n\n```javascript\nuseEffect(() => {\n  const fetchData = async () => {\n    const response = await fetch('/api/data');\n    const data = await response.json();\n    setData(data);\n  };\n  fetchData();\n}, []);\n```\n\n### useContext\n\nAccess context without prop drilling:\n\n```javascript\nconst theme = useContext(ThemeContext);\n```\n\n## Custom Hooks\n\nCreate reusable logic:\n\n```javascript\nfunction useLocalStorage(key, initialValue) {\n  const [value, setValue] = useState(() => {\n    const stored = localStorage.getItem(key);\n    return stored ? JSON.parse(stored) : initialValue;\n  });\n\n  useEffect(() => {\n    localStorage.setItem(key, JSON.stringify(value));\n  }, [key, value]);\n\n  return [value, setValue];\n}\n```\n\n## Best Practices\n\n- Always follow the Rules of Hooks\n- Keep hooks at the top level\n- Use custom hooks for reusable logic\n- Memoize expensive computations",
+      "category": "JavaScript",
+      "tags": ["react", "hooks", "javascript", "frontend"],
+      "image": "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&auto=format",
+      "author": "Đông Dev",
+      "date": "2024-12-05",
+      "readTime": 5,
+      "featured": false
+    },
+    {
+      "id": "nodejs-performance",
+      "title": "Node.js Performance Optimization Tips",
+      "slug": "nodejs-performance-optimization",
+      "excerpt": "Boost your Node.js application performance with these proven optimization techniques and best practices.",
+      "content": "## Why Performance Matters\n\nA fast application means better user experience and lower infrastructure costs.\n\n## Optimization Techniques\n\n### 1. Use Async/Await Properly\n\n```javascript\n// Bad - Sequential\nconst user = await getUser(id);\nconst posts = await getPosts(userId);\n\n// Good - Parallel\nconst [user, posts] = await Promise.all([\n  getUser(id),\n  getPosts(userId)\n]);\n```\n\n### 2. Implement Caching\n\n```javascript\nconst NodeCache = require('node-cache');\nconst cache = new NodeCache({ stdTTL: 600 });\n\nasync function getData(key) {\n  let data = cache.get(key);\n  if (!data) {\n    data = await fetchFromDB(key);\n    cache.set(key, data);\n  }\n  return data;\n}\n```\n\n### 3. Use Streams for Large Data\n\n```javascript\nconst fs = require('fs');\nconst { pipeline } = require('stream/promises');\n\nawait pipeline(\n  fs.createReadStream('large-file.csv'),\n  transformStream,\n  fs.createWriteStream('output.csv')\n);\n```\n\n### 4. Database Query Optimization\n\n- Add proper indexes\n- Use connection pooling\n- Avoid N+1 queries\n- Use pagination\n\n## Monitoring\n\nAlways measure before and after optimization:\n- Response time (p50, p95, p99)\n- Memory usage\n- CPU utilization",
+      "category": "Backend",
+      "tags": ["nodejs", "performance", "optimization", "backend"],
+      "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format",
+      "author": "Đông Dev",
+      "date": "2024-11-28",
+      "readTime": 6,
+      "featured": false
+    },
+    {
+      "id": "modern-css-techniques",
+      "title": "Modern CSS Techniques for Beautiful UIs",
+      "slug": "modern-css-techniques",
+      "excerpt": "Explore modern CSS features like Grid, Flexbox, and CSS Variables to create stunning user interfaces.",
+      "content": "## Modern CSS is Powerful\n\nCSS has evolved significantly. Let's explore the latest features.\n\n## CSS Grid\n\nCreate complex layouts easily:\n\n```css\n.grid-container {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\n  gap: 24px;\n}\n```\n\n## CSS Variables\n\nCreate themeable designs:\n\n```css\n:root {\n  --primary: #6366f1;\n  --bg-dark: #0a0a14;\n  --text: #f5f5ff;\n}\n\n.button {\n  background: var(--primary);\n  color: var(--text);\n}\n```\n\n## Glassmorphism Effect\n\n```css\n.glass-card {\n  background: rgba(255, 255, 255, 0.05);\n  backdrop-filter: blur(20px);\n  border: 1px solid rgba(255, 255, 255, 0.1);\n  border-radius: 20px;\n}\n```\n\n## Animations\n\n```css\n@keyframes float {\n  0%, 100% { transform: translateY(0); }\n  50% { transform: translateY(-20px); }\n}\n\n.floating {\n  animation: float 3s ease-in-out infinite;\n}\n```\n\n## Tips\n\n- Use CSS custom properties for theming\n- Prefer Grid for 2D layouts, Flexbox for 1D\n- Use `clamp()` for responsive typography\n- Leverage `aspect-ratio` for media",
+      "category": "UI/UX",
+      "tags": ["css", "design", "frontend", "ui"],
+      "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format",
+      "author": "Đông Dev",
+      "date": "2024-11-20",
+      "readTime": 4,
+      "featured": false
+    }
+  ]
+}

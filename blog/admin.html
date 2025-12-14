@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <title>Blog Admin - Đông Dev</title>
+  <link rel="icon" href="../assets/favicon.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="../js/security.js"></script>
+  <script>
+    // Auth check
+    (function() {
+      const token = sessionStorage.getItem('admin_token');
+      const expires = sessionStorage.getItem('admin_expires');
+      if (!token || !expires || Date.now() > parseInt(expires)) {
+        window.location.href = '../admin/auth.html';
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      --bg-dark: #0a0a14;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --text-primary: #f5f5ff;
+      --text-secondary: rgba(245, 245, 255, 0.75);
+      --text-muted: rgba(245, 245, 255, 0.5);
+      --neon-purple: #b14aed;
+      --neon-blue: #00b4ff;
+      --neon-cyan: #00ffea;
+      --neon-pink: #ff2d75;
+      --iris-purple: #a78bfa;
+      --success: #00ff88;
+      --error: #ff2d75;
+      --gradient-primary: linear-gradient(135deg, #ff2d75 0%, #b14aed 30%, #00b4ff 60%, #00ffea 100%);
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+  </style>
+</head>
+<body>
+  <div class="mesh-bg"></div>
+  <header class="admin-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Về Portfolio</a>
+      <h1 class="admin-title"><i class="fa-solid fa-pen-to-square"></i> Blog Admin</h1>
+      <div class="header-actions">
+        <button class="btn btn-primary" id="btnNewPost"><i class="fa-solid fa-plus"></i> Bài viết mới</button>
+      </div>
+    </div>
+  </header>
+  <main class="admin-main"><div class="container" id="appContainer"></div></main>
+</body>
+</html>
+
+<style>
+    /* Background */
+    .mesh-bg {
+      position: fixed; inset: 0; z-index: -1;
+      background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 50%, #050510 100%);
+    }
+    .mesh-bg::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 20% 20%, rgba(177, 74, 237, 0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 80%, rgba(0, 180, 255, 0.04) 0%, transparent 50%);
+    }
+
+    /* Header */
+    .admin-header {
+      background: rgba(10, 10, 20, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 16px 0;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .back-link {
+      display: flex; align-items: center; gap: 8px;
+      color: var(--text-secondary); font-weight: 500; transition: color 0.3s;
+    }
+    .back-link:hover { color: var(--neon-cyan); }
+    .admin-title {
+      font-size: 1.3rem; font-weight: 700;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .admin-title i { color: var(--neon-purple); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 20px; font-weight: 600; font-size: 0.9rem;
+      border-radius: var(--radius-sm); border: none; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-primary {
+      background: var(--gradient-primary); color: white;
+      box-shadow: 0 4px 15px rgba(177, 74, 237, 0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(177, 74, 237, 0.4); }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08); color: var(--text-primary);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.25); }
+    .btn-danger { background: rgba(255, 45, 117, 0.2); color: var(--neon-pink); border: 1px solid rgba(255, 45, 117, 0.3); }
+    .btn-danger:hover { background: rgba(255, 45, 117, 0.3); }
+    .btn-success { background: rgba(0, 255, 136, 0.2); color: var(--success); border: 1px solid rgba(0, 255, 136, 0.3); }
+    .btn-success:hover { background: rgba(0, 255, 136, 0.3); }
+    .btn-sm { padding: 8px 14px; font-size: 0.85rem; }
+
+    /* Main */
+    .admin-main { padding: 32px 0; }
+</style>
+
+<style>
+    /* Layout */
+    .admin-layout { display: grid; grid-template-columns: 1fr 400px; gap: 24px; }
+    @media (max-width: 1100px) { .admin-layout { grid-template-columns: 1fr; } }
+
+    /* Cards */
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .card-title { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .card-title i { color: var(--iris-purple); }
+
+    /* Form */
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      display: block; font-weight: 500; font-size: 0.9rem;
+      color: var(--text-secondary); margin-bottom: 8px;
+    }
+    .form-label span { color: var(--neon-pink); }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary); font-family: inherit; font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none; border-color: var(--neon-purple);
+      background: rgba(177, 74, 237, 0.05);
+      box-shadow: 0 0 20px rgba(177, 74, 237, 0.1);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+    .form-textarea { min-height: 300px; resize: vertical; font-family: var(--font-mono); line-height: 1.7; }
+    .form-select { cursor: pointer; }
+    .form-select option { background: var(--bg-dark); color: var(--text-primary); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    .form-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
+    .form-actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+
+    /* Checkbox */
+    .form-checkbox { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .form-checkbox input { display: none; }
+    .checkbox-box {
+      width: 22px; height: 22px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .checkbox-box i { color: white; font-size: 0.7rem; opacity: 0; transition: opacity 0.2s; }
+    .form-checkbox input:checked + .checkbox-box { background: var(--neon-purple); border-color: var(--neon-purple); }
+    .form-checkbox input:checked + .checkbox-box i { opacity: 1; }
+</style>
+
+<style>
+    /* Posts List */
+    .posts-list { display: flex; flex-direction: column; gap: 12px; }
+    .post-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px; background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      transition: all 0.3s ease; cursor: pointer;
+    }
+    .post-item:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15); }
+    .post-item.active { border-color: var(--neon-purple); background: rgba(177, 74, 237, 0.1); }
+    .post-thumb {
+      width: 80px; height: 50px; border-radius: 8px;
+      object-fit: cover; flex-shrink: 0;
+    }
+    .post-info { flex: 1; min-width: 0; }
+    .post-info h4 {
+      font-size: 0.95rem; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .post-info p { font-size: 0.8rem; color: var(--text-muted); }
+    .post-actions { display: flex; gap: 8px; }
+    .post-actions button {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px; color: var(--text-secondary);
+      cursor: pointer; transition: all 0.3s;
+    }
+    .post-actions button:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
+    .post-actions .btn-delete:hover { background: rgba(255, 45, 117, 0.2); color: var(--neon-pink); border-color: var(--neon-pink); }
+
+    /* Tags Input */
+    .tags-container {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 10px; background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm); min-height: 50px;
+    }
+    .tag-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; background: rgba(0, 180, 255, 0.15);
+      border: 1px solid rgba(0, 180, 255, 0.3);
+      border-radius: 100px; font-size: 0.85rem; color: var(--neon-cyan);
+    }
+    .tag-item button {
+      background: none; border: none; color: inherit;
+      cursor: pointer; padding: 0; font-size: 0.8rem;
+    }
+    .tag-item button:hover { color: var(--neon-pink); }
+    .tags-input {
+      flex: 1; min-width: 100px; padding: 6px;
+      background: transparent; border: none;
+      color: var(--text-primary); font-size: 0.9rem;
+    }
+    .tags-input:focus { outline: none; }
+    .tags-input::placeholder { color: var(--text-muted); }
+
+    /* Preview */
+    .preview-content {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-sm);
+      padding: 20px; max-height: 400px; overflow-y: auto;
+    }
+    .preview-content h2 { font-size: 1.4rem; margin: 24px 0 12px; color: var(--text-primary); }
+    .preview-content h2:first-child { margin-top: 0; }
+    .preview-content h3 { font-size: 1.1rem; margin: 20px 0 10px; color: var(--neon-cyan); }
+    .preview-content p { margin-bottom: 12px; color: var(--text-secondary); }
+    .preview-content code { background: rgba(177, 74, 237, 0.15); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.85rem; }
+    .preview-content pre { background: rgba(0, 0, 0, 0.4); padding: 16px; border-radius: 8px; overflow-x: auto; margin: 16px 0; }
+    .preview-content pre code { background: none; padding: 0; }
+    .preview-content ul, .preview-content ol { margin: 12px 0 12px 20px; color: var(--text-secondary); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 16px 24px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 500; z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.success { background: rgba(0, 255, 136, 0.15); border: 1px solid var(--success); color: var(--success); }
+    .toast.error { background: rgba(255, 45, 117, 0.15); border: 1px solid var(--neon-pink); color: var(--neon-pink); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* Empty State */
+    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+    .empty-state i { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
+    .empty-state p { margin-bottom: 20px; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal {
+      background: var(--bg-dark); border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius); padding: 24px; max-width: 400px; width: 90%;
+    }
+    .modal h3 { margin-bottom: 12px; }
+    .modal p { color: var(--text-secondary); margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+// Blog Admin App
+const App = {
+  posts: [],
+  currentPost: null,
+  editMode: false,
+
+  async init() {
+    await this.loadPosts();
+    this.render();
+    this.bindEvents();
+  },
+
+  async loadPosts() {
+    try {
+      const res = await fetch('posts.json');
+      const data = await res.json();
+      this.posts = data.posts || [];
+    } catch (e) {
+      this.posts = [];
+    }
+  },
+
+  render() {
+    const container = document.getElementById('appContainer');
+    container.innerHTML = `
+      <div class="admin-layout">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fa-solid fa-edit"></i> ${this.editMode ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}</h2>
+            ${this.editMode ? '<button class="btn btn-secondary btn-sm" id="btnCancelEdit"><i class="fa-solid fa-times"></i> Hủy</button>' : ''}
+          </div>
+          <form id="postForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Tiêu đề <span>*</span></label>
+                <input type="text" class="form-input" id="title" placeholder="Nhập tiêu đề bài viết" value="${this.currentPost?.title || ''}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Danh mục <span>*</span></label>
+                <select class="form-select" id="category" required>
+                  <option value="">Chọn danh mục</option>
+                  <option value="JavaScript" ${this.currentPost?.category === 'JavaScript' ? 'selected' : ''}>JavaScript</option>
+                  <option value="Backend" ${this.currentPost?.category === 'Backend' ? 'selected' : ''}>Backend</option>
+                  <option value="Frontend" ${this.currentPost?.category === 'Frontend' ? 'selected' : ''}>Frontend</option>
+                  <option value="UI/UX" ${this.currentPost?.category === 'UI/UX' ? 'selected' : ''}>UI/UX</option>
+                  <option value="DevOps" ${this.currentPost?.category === 'DevOps' ? 'selected' : ''}>DevOps</option>
+                  <option value="Architecture" ${this.currentPost?.category === 'Architecture' ? 'selected' : ''}>Architecture</option>
+                  <option value="Tutorial" ${this.currentPost?.category === 'Tutorial' ? 'selected' : ''}>Tutorial</option>
+                  <option value="Tips" ${this.currentPost?.category === 'Tips' ? 'selected' : ''}>Tips & Tricks</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mô tả ngắn <span>*</span></label>
+              <input type="text" class="form-input" id="excerpt" placeholder="Mô tả ngắn gọn về bài viết (hiển thị ở trang chủ)" value="${this.currentPost?.excerpt || ''}" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL Ảnh bìa</label>
+              <input type="url" class="form-input" id="image" placeholder="https://images.unsplash.com/..." value="${this.currentPost?.image || ''}">
+              <p class="form-hint">Dùng ảnh từ Unsplash hoặc URL ảnh khác</p>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Thời gian đọc (phút)</label>
+                <input type="number" class="form-input" id="readTime" placeholder="5" value="${this.currentPost?.readTime || 5}" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tags</label>
+                <div class="tags-container" id="tagsContainer">
+                  ${(this.currentPost?.tags || []).map(t => `<span class="tag-item">${t}<button type="button" onclick="App.removeTag('${t}')">&times;</button></span>`).join('')}
+                  <input type="text" class="tags-input" id="tagInput" placeholder="Nhập tag + Enter">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-checkbox">
+                <input type="checkbox" id="featured" ${this.currentPost?.featured ? 'checked' : ''}>
+                <span class="checkbox-box"><i class="fa-solid fa-check"></i></span>
+                <span>Đánh dấu là bài viết nổi bật</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nội dung (Markdown) <span>*</span></label>
+              <textarea class="form-textarea" id="content" placeholder="## Tiêu đề..." required>${this.currentPost?.content || ''}</textarea>
+              <p class="form-hint">Hỗ trợ Markdown: ## Heading, **bold**, *italic*, code block</p>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> ${this.editMode ? 'Cập nhật' : 'Lưu bài viết'}</button>
+              <button type="button" class="btn btn-secondary" id="btnPreview"><i class="fa-solid fa-eye"></i> Xem trước</button>
+            </div>
+          </form>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+              <h2 class="card-title"><i class="fa-solid fa-list"></i> Danh sách bài viết</h2>
+              <span style="color: var(--text-muted); font-size: 0.85rem;">${this.posts.length} bài</span>
+            </div>
+            <div class="posts-list" id="postsList">
+              ${this.posts.length === 0 ? `
+                <div class="empty-state">
+                  <i class="fa-solid fa-newspaper"></i>
+                  <p>Chưa có bài viết nào</p>
+                </div>
+              ` : this.posts.map(p => `
+                <div class="post-item ${this.currentPost?.id === p.id ? 'active' : ''}" data-id="${p.id}">
+                  <img src="${p.image || 'https://via.placeholder.com/80x50'}" alt="" class="post-thumb">
+                  <div class="post-info">
+                    <h4>${p.title}</h4>
+                    <p>${p.category} • ${p.date}</p>
+                  </div>
+                  <div class="post-actions">
+                    <button title="Sửa" onclick="App.editPost('${p.id}')"><i class="fa-solid fa-pen"></i></button>
+                    <button title="Xóa" class="btn-delete" onclick="App.confirmDelete('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i class="fa-solid fa-download"></i> Export / Import</h2>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">
+              Tải file JSON để backup hoặc import vào project
+            </p>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-success btn-sm" onclick="App.exportJSON()"><i class="fa-solid fa-download"></i> Tải JSON</button>
+              <button class="btn btn-secondary btn-sm" onclick="App.copyJSON()"><i class="fa-solid fa-copy"></i> Copy JSON</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+          <h3><i class="fa-solid fa-exclamation-triangle" style="color: var(--neon-pink);"></i> Xác nhận xóa</h3>
+          <p>Bạn có chắc muốn xóa bài viết này? Hành động này không thể hoàn tác.</p>
+          <div class="modal-actions">
+            <button class="btn btn-secondary btn-sm" onclick="App.closeModal()">Hủy</button>
+            <button class="btn btn-danger btn-sm" id="btnConfirmDelete">Xóa</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-overlay" id="previewModal">
+        <div class="modal" style="max-width: 700px;">
+          <div class="card-header" style="margin: -24px -24px 20px; padding: 16px 24px; border-radius: 16px 16px 0 0;">
+            <h3 class="card-title"><i class="fa-solid fa-eye"></i> Xem trước</h3>
+            <button class="btn btn-secondary btn-sm" onclick="App.closePreview()"><i class="fa-solid fa-times"></i></button>
+          </div>
+          <div class="preview-content" id="previewContent"></div>
+        </div>
+      </div>
+    `;
+  },
+
+  bindEvents() {
+    document.getElementById('postForm').addEventListener('submit', (e) => { e.preventDefault(); this.savePost(); });
+    document.getElementById('btnNewPost').addEventListener('click', () => this.newPost());
+    document.getElementById('btnPreview')?.addEventListener('click', () => this.showPreview());
+    document.getElementById('btnCancelEdit')?.addEventListener('click', () => this.newPost());
+    document.getElementById('tagInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); this.addTag(e.target.value); e.target.value = ''; }
+    });
+  },
+
+  tags: [],
+
+  addTag(tag) {
+    tag = tag.trim().toLowerCase();
+    if (tag && !this.tags.includes(tag)) {
+      this.tags.push(tag);
+      this.renderTags();
+    }
+  },
+
+  removeTag(tag) {
+    this.tags = this.tags.filter(t => t !== tag);
+    this.renderTags();
+  },
+
+  renderTags() {
+    const container = document.getElementById('tagsContainer');
+    const input = document.getElementById('tagInput');
+    container.innerHTML = this.tags.map(t => `<span class="tag-item">${t}<button type="button" onclick="App.removeTag('${t}')">&times;</button></span>`).join('') + `<input type="text" class="tags-input" id="tagInput" placeholder="Nhập tag + Enter">`;
+    document.getElementById('tagInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); this.addTag(e.target.value); e.target.value = ''; }
+    });
+  },
+
+  generateId(title) {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  },
+
+  savePost() {
+    const title = document.getElementById('title').value.trim();
+    const category = document.getElementById('category').value;
+    const excerpt = document.getElementById('excerpt').value.trim();
+    const image = document.getElementById('image').value.trim();
+    const readTime = parseInt(document.getElementById('readTime').value) || 5;
+    const featured = document.getElementById('featured').checked;
+    const content = document.getElementById('content').value.trim();
+
+    if (!title || !category || !excerpt || !content) {
+      this.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
+      return;
+    }
+
+    const post = {
+      id: this.editMode ? this.currentPost.id : this.generateId(title),
+      title, slug: this.generateId(title), excerpt, content, category,
+      tags: this.tags.length ? this.tags : (this.currentPost?.tags || []),
+      image: image || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format',
+      author: 'Đông Dev',
+      date: this.editMode ? this.currentPost.date : new Date().toISOString().split('T')[0],
+      readTime, featured
+    };
+
+    if (this.editMode) {
+      const idx = this.posts.findIndex(p => p.id === this.currentPost.id);
+      if (idx !== -1) this.posts[idx] = post;
+    } else {
+      this.posts.unshift(post);
+    }
+
+    this.saveToStorage();
+    this.toast(this.editMode ? 'Đã cập nhật bài viết!' : 'Đã lưu bài viết mới!', 'success');
+    this.newPost();
+  },
+
+  editPost(id) {
+    this.currentPost = this.posts.find(p => p.id === id);
+    this.editMode = true;
+    this.tags = [...(this.currentPost?.tags || [])];
+    this.render();
+    this.bindEvents();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  newPost() {
+    this.currentPost = null;
+    this.editMode = false;
+    this.tags = [];
+    this.render();
+    this.bindEvents();
+  },
+
+  confirmDelete(id) {
+    this.deleteId = id;
+    document.getElementById('deleteModal').classList.add('active');
+    document.getElementById('btnConfirmDelete').onclick = () => this.deletePost();
+  },
+
+  deletePost() {
+    this.posts = this.posts.filter(p => p.id !== this.deleteId);
+    this.saveToStorage();
+    this.closeModal();
+    this.toast('Đã xóa bài viết', 'success');
+    if (this.currentPost?.id === this.deleteId) this.newPost();
+    else this.render(), this.bindEvents();
+  },
+
+  closeModal() {
+    document.getElementById('deleteModal').classList.remove('active');
+  },
+
+  showPreview() {
+    const content = document.getElementById('content').value;
+    const title = document.getElementById('title').value;
+    document.getElementById('previewContent').innerHTML = `<h2>${title || 'Tiêu đề'}</h2>` + marked.parse(content || '*Chưa có nội dung*');
+    document.getElementById('previewModal').classList.add('active');
+  },
+
+  closePreview() {
+    document.getElementById('previewModal').classList.remove('active');
+  },
+
+  saveToStorage() {
+    localStorage.setItem('blog_posts', JSON.stringify({ posts: this.posts }));
+  },
+
+  exportJSON() {
+    const data = JSON.stringify({ posts: this.posts }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'posts.json'; a.click();
+    URL.revokeObjectURL(url);
+    this.toast('Đã tải file posts.json', 'success');
+  },
+
+  copyJSON() {
+    const data = JSON.stringify({ posts: this.posts }, null, 2);
+    navigator.clipboard.writeText(data);
+    this.toast('Đã copy JSON vào clipboard', 'success');
+  },
+
+  toast(msg, type = 'success') {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+};
+
+// Init
+document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
