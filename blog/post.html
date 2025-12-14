@@ -331,10 +331,26 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="../js/security.js"></script>
   <script type="module">
     // Get post ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const postId = urlParams.get('id');
+
+    // Helper functions
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('vi-VN', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
 
     // Load and render post
     async function loadPost() {
@@ -360,18 +376,18 @@
           if (snapshot.exists()) {
             const data = snapshot.val();
             posts = Object.values(data).sort((a, b) => new Date(b.date) - new Date(a.date));
-            console.log('Post loaded from Firebase');
+            console.log('Posts loaded from Firebase:', posts.length);
           }
         } catch (fbErr) {
           console.warn('Firebase error:', fbErr);
         }
         
         // Fallback to local JSON
-        if (!posts) {
+        if (!posts || posts.length === 0) {
           const response = await fetch('posts.json');
           const data = await response.json();
           posts = data.posts;
-          console.log('Post loaded from local JSON');
+          console.log('Posts loaded from local JSON:', posts.length);
         }
         
         const post = posts.find(p => p.id === postId);
@@ -397,21 +413,17 @@
           .filter(p => p.id !== post.id)
           .slice(0, 3);
 
-        // Security: Escape function
-        const esc = (str) => Security ? Security.escapeHtml(str) : String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-        const sanitizeUrl = (url) => Security ? Security.sanitizeUrl(url) : url;
-
-        // Render article with sanitized content
-        const contentHtml = Security ? Security.sanitizeHtml(marked.parse(post.content)) : marked.parse(post.content);
+        // Render article with content
+        const contentHtml = marked.parse(post.content || '');
         
         document.getElementById('article').innerHTML = `
           <header class="article-header">
-            <span class="article-category">${esc(post.category)}</span>
-            <h1 class="article-title">${esc(post.title)}</h1>
+            <span class="article-category">${escapeHtml(post.category)}</span>
+            <h1 class="article-title">${escapeHtml(post.title)}</h1>
             <div class="article-meta">
               <span>
-                <img src="../assets/avatar.jpg" alt="${esc(post.author)}" class="author-avatar">
-                ${esc(post.author)}
+                <img src="../assets/avatar.jpg" alt="${escapeHtml(post.author)}" class="author-avatar">
+                ${escapeHtml(post.author)}
               </span>
               <span><i class="fa-regular fa-calendar"></i> ${formatDate(post.date)}</span>
               <span><i class="fa-regular fa-clock"></i> ${post.readTime} phút đọc</span>
@@ -419,7 +431,7 @@
           </header>
 
           <div class="article-image">
-            <img src="${sanitizeUrl(post.image)}" alt="${esc(post.title)}">
+            <img src="${post.image}" alt="${escapeHtml(post.title)}">
           </div>
 
           <div class="article-content">
@@ -478,15 +490,6 @@
           </div>
         `;
       }
-    }
-
-    function formatDate(dateStr) {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('vi-VN', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
     }
 
     loadPost();
