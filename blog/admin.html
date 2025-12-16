@@ -568,8 +568,13 @@ const App = {
   },
 
   bindEvents() {
-    document.getElementById('postForm').addEventListener('submit', (e) => { e.preventDefault(); this.savePost(); });
-    document.getElementById('btnNewPost').addEventListener('click', () => this.newPost());
+    const self = this;
+    document.getElementById('postForm').addEventListener('submit', async (e) => { 
+      e.preventDefault(); 
+      console.log('Form submitted, calling savePost...');
+      await self.savePost(); 
+    });
+    document.getElementById('btnNewPost').addEventListener('click', () => self.newPost());
     document.getElementById('btnPreview')?.addEventListener('click', () => this.showPreview());
     document.getElementById('btnCancelEdit')?.addEventListener('click', () => this.newPost());
     document.getElementById('tagInput')?.addEventListener('keydown', (e) => {
