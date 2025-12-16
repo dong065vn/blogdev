@@ -333,17 +333,28 @@ const BlogAPI = {
     console.log('=== SAVING POST ===');
     console.log('Post ID:', post.id);
     console.log('Post Title:', post.title);
-    console.log('Database ref:', database);
+    console.log('Full post data:', JSON.stringify(post, null, 2));
+    console.log('Database instance:', database);
+    console.log('Database app name:', database.app.name);
+    
+    // Check current auth state
+    const currentUser = auth.currentUser;
+    console.log('Current user:', currentUser ? currentUser.email : 'NOT LOGGED IN');
+    
     try {
       const postRef = ref(database, `posts/${post.id}`);
-      console.log('Post ref created:', postRef.toString());
-      await set(postRef, post);
+      console.log('Post ref path:', `posts/${post.id}`);
+      console.log('Post ref created, calling set()...');
+      
+      const result = await set(postRef, post);
+      console.log('✅ set() completed! Result:', result);
       console.log('✅ Post saved successfully to Firebase!');
       return true;
     } catch (error) {
       console.error('❌ Error saving post:', error);
       console.error('Error code:', error.code);
       console.error('Error message:', error.message);
+      console.error('Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       alert('Firebase Error: ' + error.message);
       return false;
     }
@@ -611,7 +622,13 @@ const App = {
   },
 
   async savePost() {
-    if (this.loading) return;
+    console.log('>>> App.savePost() called');
+    console.log('Loading state:', this.loading);
+    
+    if (this.loading) {
+      console.log('Already loading, returning...');
+      return;
+    }
     
     const title = document.getElementById('title').value.trim();
     const category = document.getElementById('category').value;
@@ -621,7 +638,10 @@ const App = {
     const featured = document.getElementById('featured').checked;
     const content = document.getElementById('content').value.trim();
 
+    console.log('Form values:', { title, category, excerpt, readTime, featured, contentLength: content.length });
+
     if (!title || !category || !excerpt || !content) {
+      console.log('Validation failed - missing required fields');
       this.toast('Vui lòng điền đầy đủ thông tin bắt buộc', 'error');
       return;
     }
@@ -636,9 +656,13 @@ const App = {
       readTime, featured
     };
 
+    console.log('Post object created:', post.id, post.title);
+
     // Save to Firebase
     this.loading = true;
+    console.log('Calling BlogAPI.savePost()...');
     const saved = await BlogAPI.savePost(post);
+    console.log('BlogAPI.savePost() returned:', saved);
     
     if (saved) {
       if (this.editMode) {
