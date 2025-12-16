@@ -232,6 +232,176 @@
       color: var(--text-primary);
     }
 
+    /* Table of Contents */
+    .toc-wrapper {
+      position: relative;
+    }
+    .toc-container {
+      position: sticky;
+      top: 100px;
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+    }
+    .toc-container::-webkit-scrollbar {
+      width: 4px;
+    }
+    .toc-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+    .toc-container::-webkit-scrollbar-thumb {
+      background: rgba(177, 74, 237, 0.3);
+      border-radius: 4px;
+    }
+    .toc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .toc-title {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toc-title i {
+      color: var(--iris-purple);
+      font-size: 0.85rem;
+    }
+    .toc-toggle {
+      display: none;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .toc-toggle:hover {
+      background: rgba(177, 74, 237, 0.15);
+      color: var(--text-primary);
+    }
+    .toc-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .toc-list li {
+      margin-bottom: 4px;
+    }
+    .toc-link {
+      display: block;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-radius: 8px;
+      border-left: 2px solid transparent;
+      transition: all 0.3s;
+      line-height: 1.4;
+    }
+    .toc-link:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .toc-link.active {
+      color: var(--neon-cyan);
+      background: rgba(0, 255, 234, 0.08);
+      border-left-color: var(--neon-cyan);
+    }
+    .toc-link.toc-h3 {
+      padding-left: 24px;
+      font-size: 0.8rem;
+    }
+    .toc-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 0%;
+      background: linear-gradient(180deg, var(--neon-purple), var(--neon-cyan));
+      border-radius: 3px;
+      transition: height 0.1s;
+    }
+    
+    /* Article layout with TOC */
+    .article-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    .article-main {
+      min-width: 0;
+    }
+    
+    /* Mobile TOC */
+    .toc-mobile {
+      display: none;
+      margin-bottom: 24px;
+    }
+    .toc-mobile .toc-container {
+      position: relative;
+      top: 0;
+      max-height: none;
+    }
+    .toc-mobile .toc-list {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .toc-mobile.expanded .toc-list {
+      max-height: 500px;
+    }
+    .toc-mobile .toc-toggle {
+      display: flex;
+    }
+    .toc-mobile .toc-toggle i {
+      transition: transform 0.3s;
+    }
+    .toc-mobile.expanded .toc-toggle i {
+      transform: rotate(180deg);
+    }
+    
+    /* Reading progress bar */
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-cyan));
+      z-index: 1000;
+      transition: width 0.1s;
+    }
+
+    @media (max-width: 1100px) {
+      .article-layout {
+        grid-template-columns: 1fr;
+      }
+      .toc-sidebar {
+        display: none;
+      }
+      .toc-mobile {
+        display: block;
+      }
+    }
+
     /* Related Posts */
     .related-section {
       margin-top: 80px;
@@ -294,14 +464,117 @@
     .loading i { font-size: 2rem; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Responsive */
+    /* Responsive - Tablet */
     @media (max-width: 768px) {
-      .article-content { padding: 24px; }
-      .article-meta { gap: 16px; }
+      .container { padding: 0 16px; }
+      .article-wrapper { padding: 100px 0 60px; }
+      .article-header { margin-bottom: 32px; }
+      .article-title { margin-bottom: 16px; }
+      .article-meta { gap: 12px; font-size: 0.85rem; }
+      .article-image { margin-bottom: 32px; border-radius: 16px; }
+      .article-content { 
+        padding: 24px; 
+        border-radius: 16px;
+      }
+      .article-content h2 { font-size: 1.5rem; margin: 32px 0 16px; }
+      .article-content h3 { font-size: 1.15rem; margin: 24px 0 12px; }
+      .article-content pre { padding: 16px; margin: 20px 0; }
+      .article-tags { margin-top: 32px; padding-top: 24px; }
+      .related-section { margin-top: 60px; }
+      .related-title { font-size: 1.3rem; margin-bottom: 24px; }
+      .related-grid { gap: 16px; }
+      .blog-footer { margin-top: 60px; padding: 32px 0; }
+    }
+
+    /* Responsive - Mobile */
+    @media (max-width: 480px) {
+      .container { padding: 0 12px; }
+      .blog-header { padding: 12px 0; }
+      .back-link { font-size: 0.9rem; }
+      .back-link span { display: none; }
+      .logo { font-size: 1.1rem; }
+      .article-wrapper { padding: 90px 0 40px; }
+      .article-header { margin-bottom: 24px; }
+      .article-category { 
+        padding: 5px 12px; 
+        font-size: 0.75rem; 
+        margin-bottom: 16px; 
+      }
+      .article-title { 
+        font-size: 1.5rem; 
+        margin-bottom: 12px;
+        line-height: 1.3;
+      }
+      .article-meta { 
+        flex-direction: column; 
+        gap: 8px; 
+        font-size: 0.8rem;
+      }
+      .author-avatar { width: 32px; height: 32px; }
+      .article-image { 
+        margin-bottom: 24px; 
+        border-radius: 12px;
+        aspect-ratio: 4/3;
+      }
+      .article-content { 
+        padding: 16px; 
+        border-radius: 12px;
+      }
+      .article-content h2 { font-size: 1.3rem; margin: 28px 0 12px; }
+      .article-content h3 { font-size: 1.1rem; margin: 20px 0 10px; }
+      .article-content p { font-size: 0.95rem; margin-bottom: 16px; }
+      .article-content pre { 
+        padding: 12px; 
+        margin: 16px -16px;
+        border-radius: 0;
+        font-size: 0.8rem;
+      }
+      .article-content code { font-size: 0.8rem; }
+      .article-content ul, .article-content ol { margin-left: 16px; }
+      .article-tags { 
+        margin-top: 24px; 
+        padding-top: 20px; 
+        gap: 8px;
+      }
+      .tag { padding: 6px 12px; font-size: 0.8rem; }
+      .article-share { 
+        flex-wrap: wrap; 
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .share-btn { width: 40px; height: 40px; }
+      .toc-mobile .toc-container { padding: 16px; }
+      .toc-link { padding: 6px 10px; font-size: 0.8rem; }
+      .toc-link.toc-h3 { padding-left: 20px; font-size: 0.75rem; }
+      .related-section { margin-top: 48px; }
+      .related-title { font-size: 1.2rem; margin-bottom: 20px; }
+      .related-grid { 
+        grid-template-columns: 1fr; 
+        gap: 12px;
+      }
+      .related-card-content { padding: 16px; }
+      .related-card h4 { font-size: 0.95rem; }
+      .blog-footer { 
+        margin-top: 48px; 
+        padding: 24px 0;
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Safe area for notch devices */
+    @supports (padding: max(0px)) {
+      .blog-header {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+      }
+      .blog-footer {
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+      }
     }
   </style>
 </head>
 <body>
+  <div class="reading-progress" id="readingProgress"></div>
   <div class="mesh-bg"></div>
 
   <header class="blog-header">
@@ -433,52 +706,87 @@
             <img src="${post.image}" alt="${escapeHtml(post.title)}">
           </div>
 
-          <div class="article-content">
-            ${contentHtml}
-            
-            <div class="article-tags">
-              ${(post.tags || []).map(tag => `<span class="tag">#${tag}</span>`).join('')}
-            </div>
-
-            <div class="article-share">
-              <span>Chia sẻ:</span>
-              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" 
-                 target="_blank" class="share-btn" aria-label="Share on Facebook">
-                <i class="fa-brands fa-facebook-f"></i>
-              </a>
-              <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post.title)}" 
-                 target="_blank" class="share-btn" aria-label="Share on Twitter">
-                <i class="fa-brands fa-x-twitter"></i>
-              </a>
-              <a href="https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(post.title)}" 
-                 target="_blank" class="share-btn" aria-label="Share on LinkedIn">
-                <i class="fa-brands fa-linkedin-in"></i>
-              </a>
+          <!-- Mobile TOC -->
+          <div class="toc-mobile" id="tocMobile">
+            <div class="toc-container">
+              <div class="toc-header">
+                <span class="toc-title"><i class="fa-solid fa-list"></i> Mục lục</span>
+                <button class="toc-toggle" onclick="toggleMobileToc()">
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+              </div>
+              <ul class="toc-list" id="tocListMobile"></ul>
             </div>
           </div>
 
-          ${relatedPosts.length > 0 ? `
-            <section class="related-section">
-              <h3 class="related-title">Bài viết liên quan</h3>
-              <div class="related-grid">
-                ${relatedPosts.map(p => `
-                  <a href="post.html?id=${p.id}" class="related-card">
-                    <img src="${p.image}" alt="${p.title}">
-                    <div class="related-card-content">
-                      <h4>${p.title}</h4>
-                      <p>${p.readTime} phút đọc</p>
-                    </div>
-                  </a>
-                `).join('')}
+          <div class="article-layout">
+            <!-- Sidebar TOC -->
+            <aside class="toc-sidebar toc-wrapper">
+              <div class="toc-container">
+                <div class="toc-progress" id="tocProgress"></div>
+                <div class="toc-header">
+                  <span class="toc-title"><i class="fa-solid fa-list"></i> Mục lục</span>
+                </div>
+                <ul class="toc-list" id="tocList"></ul>
               </div>
-            </section>
-          ` : ''}
+            </aside>
+
+            <!-- Main Content -->
+            <div class="article-main">
+              <div class="article-content" id="articleContent">
+                ${contentHtml}
+                
+                <div class="article-tags">
+                  ${(post.tags || []).map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                </div>
+
+                <div class="article-share">
+                  <span>Chia sẻ:</span>
+                  <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" 
+                     target="_blank" class="share-btn" aria-label="Share on Facebook">
+                    <i class="fa-brands fa-facebook-f"></i>
+                  </a>
+                  <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(post.title)}" 
+                     target="_blank" class="share-btn" aria-label="Share on Twitter">
+                    <i class="fa-brands fa-x-twitter"></i>
+                  </a>
+                  <a href="https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(post.title)}" 
+                     target="_blank" class="share-btn" aria-label="Share on LinkedIn">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                  </a>
+                </div>
+              </div>
+
+              ${relatedPosts.length > 0 ? `
+                <section class="related-section">
+                  <h3 class="related-title">Bài viết liên quan</h3>
+                  <div class="related-grid">
+                    ${relatedPosts.map(p => `
+                      <a href="post.html?id=${p.id}" class="related-card">
+                        <img src="${p.image}" alt="${p.title}">
+                        <div class="related-card-content">
+                          <h4>${p.title}</h4>
+                          <p>${p.readTime} phút đọc</p>
+                        </div>
+                      </a>
+                    `).join('')}
+                  </div>
+                </section>
+              ` : ''}
+            </div>
+          </div>
         `;
+
+        // Generate TOC
+        generateTOC();
 
         // Highlight code blocks
         document.querySelectorAll('pre code').forEach(block => {
           hljs.highlightElement(block);
         });
+
+        // Setup scroll tracking
+        setupScrollTracking();
 
       } catch (error) {
         console.error('Error loading post:', error);
@@ -492,6 +800,150 @@
     }
 
     loadPost();
+
+    // Generate Table of Contents
+    function generateTOC() {
+      const content = document.getElementById('articleContent');
+      if (!content) return;
+
+      const headings = content.querySelectorAll('h2, h3');
+      if (headings.length === 0) {
+        // Hide TOC if no headings
+        const tocSidebar = document.querySelector('.toc-sidebar');
+        const tocMobile = document.getElementById('tocMobile');
+        if (tocSidebar) tocSidebar.style.display = 'none';
+        if (tocMobile) tocMobile.style.display = 'none';
+        
+        // Reset layout to single column
+        const layout = document.querySelector('.article-layout');
+        if (layout) layout.style.gridTemplateColumns = '1fr';
+        return;
+      }
+
+      const tocList = document.getElementById('tocList');
+      const tocListMobile = document.getElementById('tocListMobile');
+      let tocHtml = '';
+
+      headings.forEach((heading, index) => {
+        // Add ID to heading for anchor
+        const id = `heading-${index}`;
+        heading.id = id;
+
+        const level = heading.tagName.toLowerCase();
+        const text = heading.textContent;
+
+        tocHtml += `
+          <li>
+            <a href="#${id}" class="toc-link toc-${level}" data-target="${id}">
+              ${text}
+            </a>
+          </li>
+        `;
+      });
+
+      if (tocList) tocList.innerHTML = tocHtml;
+      if (tocListMobile) tocListMobile.innerHTML = tocHtml;
+
+      // Add click handlers for smooth scroll
+      document.querySelectorAll('.toc-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute('data-target');
+          const target = document.getElementById(targetId);
+          if (target) {
+            const offset = 100; // Header height
+            const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({ top, behavior: 'smooth' });
+            
+            // Close mobile TOC after click
+            const tocMobile = document.getElementById('tocMobile');
+            if (tocMobile && tocMobile.classList.contains('expanded')) {
+              tocMobile.classList.remove('expanded');
+            }
+          }
+        });
+      });
+    }
+
+    // Toggle mobile TOC
+    window.toggleMobileToc = function() {
+      const tocMobile = document.getElementById('tocMobile');
+      if (tocMobile) {
+        tocMobile.classList.toggle('expanded');
+      }
+    };
+
+    // Setup scroll tracking for active TOC item and reading progress
+    function setupScrollTracking() {
+      const content = document.getElementById('articleContent');
+      if (!content) return;
+
+      const headings = content.querySelectorAll('h2, h3');
+      const tocLinks = document.querySelectorAll('.toc-link');
+      const readingProgress = document.getElementById('readingProgress');
+      const tocProgress = document.getElementById('tocProgress');
+
+      if (headings.length === 0) return;
+
+      function updateActiveHeading() {
+        const scrollPos = window.scrollY + 150;
+
+        // Find current heading
+        let currentHeading = null;
+        headings.forEach(heading => {
+          if (heading.offsetTop <= scrollPos) {
+            currentHeading = heading;
+          }
+        });
+
+        // Update active class
+        tocLinks.forEach(link => {
+          link.classList.remove('active');
+          if (currentHeading && link.getAttribute('data-target') === currentHeading.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+
+      function updateReadingProgress() {
+        const article = document.querySelector('.article-wrapper');
+        if (!article) return;
+
+        const articleTop = article.offsetTop;
+        const articleHeight = article.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const scrollPos = window.scrollY;
+
+        // Calculate progress
+        const start = articleTop;
+        const end = articleTop + articleHeight - windowHeight;
+        const progress = Math.min(Math.max((scrollPos - start) / (end - start) * 100, 0), 100);
+
+        if (readingProgress) {
+          readingProgress.style.width = `${progress}%`;
+        }
+        if (tocProgress) {
+          tocProgress.style.height = `${progress}%`;
+        }
+      }
+
+      // Throttle scroll events
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            updateActiveHeading();
+            updateReadingProgress();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      // Initial update
+      updateActiveHeading();
+      updateReadingProgress();
+    }
   </script>
 </body>
 </html>

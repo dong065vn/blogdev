@@ -290,6 +290,197 @@
     .modal h3 { margin-bottom: 12px; }
     .modal p { color: var(--text-secondary); margin-bottom: 20px; }
     .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
+    /* ========== RESPONSIVE MOBILE ========== */
+    
+    /* Tablet */
+    @media (max-width: 900px) {
+      .container { padding: 0 16px; }
+      .header-inner { 
+        flex-wrap: wrap; 
+        gap: 12px;
+      }
+      .admin-title { 
+        font-size: 1.1rem; 
+        order: -1;
+        width: 100%;
+        justify-content: center;
+      }
+      .back-link { font-size: 0.9rem; }
+      .header-actions { margin-left: auto; }
+      .header-actions .btn { padding: 10px 16px; font-size: 0.85rem; }
+      .admin-main { padding: 24px 0; }
+      .card { padding: 20px; }
+      .card-header { flex-wrap: wrap; gap: 12px; }
+      .form-textarea { min-height: 250px; }
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      .container { padding: 0 12px; }
+      .admin-header { padding: 12px 0; }
+      .header-inner { 
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .admin-title { 
+        font-size: 1rem;
+        justify-content: center;
+      }
+      .admin-title i { display: none; }
+      .back-link { 
+        font-size: 0.85rem;
+        justify-content: center;
+      }
+      .header-actions { 
+        display: flex;
+        justify-content: center;
+      }
+      .header-actions .btn { 
+        flex: 1;
+        justify-content: center;
+        padding: 12px 16px;
+      }
+      .admin-main { padding: 16px 0; }
+      .card { 
+        padding: 16px; 
+        border-radius: 12px;
+      }
+      .card-header { 
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+      }
+      .card-title { font-size: 1rem; }
+      .form-group { margin-bottom: 16px; }
+      .form-label { font-size: 0.85rem; margin-bottom: 6px; }
+      .form-input, .form-textarea, .form-select { 
+        padding: 12px 14px; 
+        font-size: 0.9rem;
+        border-radius: 8px;
+      }
+      .form-textarea { min-height: 200px; }
+      .form-hint { font-size: 0.75rem; }
+      .form-actions { 
+        flex-direction: column;
+        gap: 10px;
+      }
+      .form-actions .btn { 
+        width: 100%;
+        justify-content: center;
+      }
+      .btn { 
+        padding: 12px 16px; 
+        font-size: 0.85rem;
+        border-radius: 8px;
+      }
+      .btn-sm { padding: 10px 14px; }
+      
+      /* Posts list mobile */
+      .post-item { 
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px;
+      }
+      .post-thumb { 
+        width: 100%; 
+        height: 120px;
+        border-radius: 8px;
+      }
+      .post-info { width: 100%; }
+      .post-info h4 { 
+        font-size: 0.9rem;
+        white-space: normal;
+        line-height: 1.4;
+      }
+      .post-info p { font-size: 0.75rem; }
+      .post-actions { 
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .post-actions button { 
+        width: 40px; 
+        height: 40px;
+      }
+      
+      /* Tags mobile */
+      .tags-container { 
+        padding: 8px;
+        min-height: 44px;
+      }
+      .tag-item { 
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+      .tags-input { 
+        padding: 5px;
+        font-size: 0.85rem;
+      }
+      
+      /* Checkbox mobile */
+      .form-checkbox { font-size: 0.9rem; }
+      .checkbox-box { width: 20px; height: 20px; }
+      
+      /* Toast mobile */
+      .toast { 
+        bottom: 16px; 
+        right: 16px; 
+        left: 16px;
+        padding: 14px 16px;
+        font-size: 0.9rem;
+      }
+      
+      /* Modal mobile */
+      .modal { 
+        padding: 20px;
+        margin: 16px;
+        max-width: calc(100% - 32px);
+      }
+      .modal h3 { font-size: 1.1rem; }
+      .modal p { font-size: 0.9rem; }
+      .modal-actions { 
+        flex-direction: column-reverse;
+        gap: 10px;
+      }
+      .modal-actions .btn { 
+        width: 100%;
+        justify-content: center;
+      }
+      
+      /* Preview mobile */
+      .preview-content { 
+        padding: 16px;
+        max-height: 300px;
+      }
+      .preview-content h2 { font-size: 1.2rem; }
+      .preview-content h3 { font-size: 1rem; }
+    }
+
+    /* Small mobile */
+    @media (max-width: 380px) {
+      .container { padding: 0 10px; }
+      .card { padding: 14px; }
+      .form-input, .form-textarea, .form-select { 
+        padding: 10px 12px;
+        font-size: 0.85rem;
+      }
+      .btn { padding: 10px 14px; font-size: 0.8rem; }
+    }
+
+    /* Safe area for notch devices */
+    @supports (padding: max(0px)) {
+      .admin-header {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+      }
+      .toast {
+        bottom: max(16px, env(safe-area-inset-bottom));
+      }
+    }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -725,7 +916,9 @@ const App = {
   showPreview() {
     const content = document.getElementById('content').value;
     const title = document.getElementById('title').value;
-    document.getElementById('previewContent').innerHTML = `<h2>${title || 'Tiêu đề'}</h2>` + marked.parse(content || '*Chưa có nội dung*');
+    // Escape title to prevent XSS, but allow markdown content (marked.js sanitizes)
+    const safeTitle = title ? title.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])) : 'Tiêu đề';
+    document.getElementById('previewContent').innerHTML = `<h2>${safeTitle}</h2>` + marked.parse(content || '*Chưa có nội dung*');
     document.getElementById('previewModal').classList.add('active');
   },
 
@@ -758,14 +951,26 @@ const App = {
     this.toast('Đã copy JSON vào clipboard', 'success');
   },
 
+  toastTimeout: null,
+  
   toast(msg, type = 'success') {
+    // Clear existing timeout to prevent memory leak
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+      this.toastTimeout = null;
+    }
     const existing = document.querySelector('.toast');
     if (existing) existing.remove();
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.innerHTML = `<i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+    // Escape message to prevent XSS
+    const safeMsg = msg.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+    toast.innerHTML = `<i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${safeMsg}`;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
+    this.toastTimeout = setTimeout(() => {
+      toast.remove();
+      this.toastTimeout = null;
+    }, 3000);
   }
 };
 
