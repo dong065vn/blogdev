@@ -601,7 +601,10 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, get, set, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+// Cloudinary config (free tier - 25GB/month)
+const CLOUDINARY_CLOUD_NAME = 'dyvdmsuw1';
+const CLOUDINARY_UPLOAD_PRESET = 'blog_unsigned';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
@@ -616,7 +619,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
-const storage = getStorage(app);
+
+// Upload to Cloudinary (free, no CORS issues)
+async function uploadToCloudinary(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  formData.append('folder', 'blog');
+  
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+    method: 'POST',
+    body: formData
+  });
+  
+  if (!response.ok) throw new Error('Upload failed');
+  const data = await response.json();
+  return data.secure_url;
+}
 
 // Blog API functions
 const BlogAPI = {
@@ -1003,9 +1022,9 @@ const App = {
     if (!file) return;
     
     // Validate file
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 10 * 1024 * 1024; // 10MB (Cloudinary free allows up to 10MB)
     if (file.size > maxSize) {
-      this.toast('Ảnh quá lớn! Tối đa 5MB', 'error');
+      this.toast('Ảnh quá lớn! Tối đa 10MB', 'error');
       return;
     }
     
@@ -1021,26 +1040,11 @@ const App = {
     
     try {
       progressContainer.style.display = 'flex';
-      progressFill.style.width = '10%';
-      progressText.textContent = 'Đang chuẩn bị...';
-      
-      // Generate unique filename
-      const timestamp = Date.now();
-      const safeName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-      const filename = `blog/${timestamp}_${safeName}`;
-      
       progressFill.style.width = '30%';
-      progressText.textContent = 'Đang upload...';
+      progressText.textContent = 'Đang upload lên Cloudinary...';
       
-      // Upload to Firebase Storage
-      const imageRef = storageRef(storage, filename);
-      await uploadBytes(imageRef, file);
-      
-      progressFill.style.width = '80%';
-      progressText.textContent = 'Đang lấy URL...';
-      
-      // Get download URL
-      const downloadURL = await getDownloadURL(imageRef);
+      // Upload to Cloudinary (free, no CORS issues)
+      const downloadURL = await uploadToCloudinary(file);
       
       progressFill.style.width = '100%';
       progressText.textContent = 'Hoàn tất!';
@@ -1355,22 +1359,17 @@ const App = {
   async uploadGalleryImage(file) {
     if (!file) return;
     
-    const maxSize = 5 * 1024 * 1024;
+    const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      this.toast('Ảnh quá lớn! Tối đa 5MB', 'error');
+      this.toast('Ảnh quá lớn! Tối đa 10MB', 'error');
       return;
     }
     
     try {
-      this.toast('Đang upload...', 'success');
+      this.toast('Đang upload lên Cloudinary...', 'success');
       
-      const timestamp = Date.now();
-      const safeName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-      const filename = `gallery/${timestamp}_${safeName}`;
-      
-      const imageRef = storageRef(storage, filename);
-      await uploadBytes(imageRef, file);
-      const downloadURL = await getDownloadURL(imageRef);
+      // Upload to Cloudinary (free, no CORS issues)
+      const downloadURL = await uploadToCloudinary(file);
       
       this.uploadedImages.unshift({
         url: downloadURL,
