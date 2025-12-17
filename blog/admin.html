@@ -215,6 +215,45 @@
     .visibility-public { background: rgba(0, 255, 136, 0.15); color: var(--success); }
     .visibility-private { background: rgba(255, 45, 117, 0.15); color: var(--neon-pink); }
     .visibility-draft { background: rgba(0, 180, 255, 0.15); color: var(--neon-blue); }
+
+    /* Image Upload */
+    .image-upload-container {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .image-preview {
+      width: 100%; height: 180px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-sm);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; color: var(--text-muted);
+      background-size: cover; background-position: center;
+      transition: all 0.3s ease;
+    }
+    .image-preview:hover { border-color: var(--neon-purple); }
+    .image-preview.has-image { border-style: solid; border-color: var(--success); }
+    .image-preview i { font-size: 2rem; opacity: 0.5; }
+    .image-preview span { font-size: 0.85rem; }
+    .image-upload-actions {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .upload-btn { cursor: pointer; }
+    .upload-btn:hover { background: rgba(177, 74, 237, 0.2); }
+    .upload-or { color: var(--text-muted); font-size: 0.85rem; }
+    .upload-progress {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .progress-bar {
+      flex: 1; height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; width: 0%;
+      background: var(--gradient-primary);
+      transition: width 0.3s ease;
+    }
+    .progress-text { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
     .post-actions { display: flex; gap: 8px; }
     .post-actions button {
       width: 32px; height: 32px;
@@ -498,6 +537,7 @@
 import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, get, set, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
@@ -512,6 +552,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
+const storage = getStorage(app);
 
 // Blog API functions
 const BlogAPI = {
@@ -694,9 +735,25 @@ const App = {
               <input type="text" class="form-input" id="excerpt" placeholder="Mô tả ngắn gọn về bài viết (hiển thị ở trang chủ)" value="${this.currentPost?.excerpt || ''}" required>
             </div>
             <div class="form-group">
-              <label class="form-label">URL Ảnh bìa</label>
-              <input type="url" class="form-input" id="image" placeholder="https://images.unsplash.com/..." value="${this.currentPost?.image || ''}">
-              <p class="form-hint">Dùng ảnh từ Unsplash hoặc URL ảnh khác</p>
+              <label class="form-label">Ảnh bìa</label>
+              <div class="image-upload-container">
+                <div class="image-preview" id="imagePreview" style="${this.currentPost?.image ? `background-image: url('${this.currentPost.image}')` : ''}">
+                  ${!this.currentPost?.image ? '<i class="fa-solid fa-image"></i><span>Chưa có ảnh</span>' : ''}
+                </div>
+                <div class="image-upload-actions">
+                  <label class="btn btn-secondary btn-sm upload-btn">
+                    <i class="fa-solid fa-upload"></i> Upload ảnh
+                    <input type="file" id="imageFile" accept="image/*" style="display: none;">
+                  </label>
+                  <span class="upload-or">hoặc</span>
+                  <input type="url" class="form-input" id="image" placeholder="Nhập URL ảnh..." value="${this.currentPost?.image || ''}" style="flex: 1;">
+                </div>
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                  <span class="progress-text" id="progressText">Đang upload...</span>
+                </div>
+              </div>
+              <p class="form-hint">Upload ảnh trực tiếp hoặc dùng URL từ Unsplash</p>
             </div>
             <div class="form-group">
               <label class="form-label">Tags</label>
@@ -799,6 +856,96 @@ const App = {
     document.getElementById('tagInput')?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); this.addTag(e.target.value); e.target.value = ''; }
     });
+    
+    // Image upload handler
+    document.getElementById('imageFile')?.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) await self.uploadImage(file);
+    });
+    
+    // Image URL input handler - update preview
+    document.getElementById('image')?.addEventListener('input', (e) => {
+      self.updateImagePreview(e.target.value);
+    });
+  },
+  
+  updateImagePreview(url) {
+    const preview = document.getElementById('imagePreview');
+    if (!preview) return;
+    
+    if (url) {
+      preview.style.backgroundImage = `url('${url}')`;
+      preview.innerHTML = '';
+      preview.classList.add('has-image');
+    } else {
+      preview.style.backgroundImage = '';
+      preview.innerHTML = '<i class="fa-solid fa-image"></i><span>Chưa có ảnh</span>';
+      preview.classList.remove('has-image');
+    }
+  },
+  
+  async uploadImage(file) {
+    if (!file) return;
+    
+    // Validate file
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      this.toast('Ảnh quá lớn! Tối đa 5MB', 'error');
+      return;
+    }
+    
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.toast('Chỉ hỗ trợ JPG, PNG, GIF, WebP', 'error');
+      return;
+    }
+    
+    const progressContainer = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    
+    try {
+      progressContainer.style.display = 'flex';
+      progressFill.style.width = '10%';
+      progressText.textContent = 'Đang chuẩn bị...';
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const safeName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+      const filename = `blog/${timestamp}_${safeName}`;
+      
+      progressFill.style.width = '30%';
+      progressText.textContent = 'Đang upload...';
+      
+      // Upload to Firebase Storage
+      const imageRef = storageRef(storage, filename);
+      await uploadBytes(imageRef, file);
+      
+      progressFill.style.width = '80%';
+      progressText.textContent = 'Đang lấy URL...';
+      
+      // Get download URL
+      const downloadURL = await getDownloadURL(imageRef);
+      
+      progressFill.style.width = '100%';
+      progressText.textContent = 'Hoàn tất!';
+      
+      // Update form
+      document.getElementById('image').value = downloadURL;
+      this.updateImagePreview(downloadURL);
+      
+      this.toast('Upload ảnh thành công!', 'success');
+      
+      setTimeout(() => {
+        progressContainer.style.display = 'none';
+        progressFill.style.width = '0%';
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Upload error:', error);
+      progressContainer.style.display = 'none';
+      this.toast('Lỗi upload: ' + error.message, 'error');
+    }
   },
 
   tags: [],
