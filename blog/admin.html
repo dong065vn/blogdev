@@ -206,6 +206,15 @@
       margin-bottom: 4px;
     }
     .post-info p { font-size: 0.8rem; color: var(--text-muted); }
+    
+    /* Visibility badges */
+    .visibility-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;
+    }
+    .visibility-public { background: rgba(0, 255, 136, 0.15); color: var(--success); }
+    .visibility-private { background: rgba(255, 45, 117, 0.15); color: var(--neon-pink); }
+    .visibility-draft { background: rgba(0, 180, 255, 0.15); color: var(--neon-blue); }
     .post-actions { display: flex; gap: 8px; }
     .post-actions button {
       width: 32px; height: 32px;
@@ -666,6 +675,20 @@ const App = {
                 </select>
               </div>
             </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Quyền hiển thị <span>*</span></label>
+                <select class="form-select" id="visibility" required>
+                  <option value="public" ${(this.currentPost?.visibility || 'public') === 'public' ? 'selected' : ''}>🌐 Công khai - Ai cũng xem được</option>
+                  <option value="private" ${this.currentPost?.visibility === 'private' ? 'selected' : ''}>🔒 Riêng tư - Chỉ admin xem</option>
+                  <option value="draft" ${this.currentPost?.visibility === 'draft' ? 'selected' : ''}>📝 Bản nháp - Chưa xuất bản</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Thời gian đọc (phút)</label>
+                <input type="number" class="form-input" id="readTime" placeholder="5" value="${this.currentPost?.readTime || 5}" min="1">
+              </div>
+            </div>
             <div class="form-group">
               <label class="form-label">Mô tả ngắn <span>*</span></label>
               <input type="text" class="form-input" id="excerpt" placeholder="Mô tả ngắn gọn về bài viết (hiển thị ở trang chủ)" value="${this.currentPost?.excerpt || ''}" required>
@@ -675,17 +698,11 @@ const App = {
               <input type="url" class="form-input" id="image" placeholder="https://images.unsplash.com/..." value="${this.currentPost?.image || ''}">
               <p class="form-hint">Dùng ảnh từ Unsplash hoặc URL ảnh khác</p>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Thời gian đọc (phút)</label>
-                <input type="number" class="form-input" id="readTime" placeholder="5" value="${this.currentPost?.readTime || 5}" min="1">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Tags</label>
-                <div class="tags-container" id="tagsContainer">
-                  ${(this.currentPost?.tags || []).map(t => `<span class="tag-item">${t}<button type="button" onclick="App.removeTag('${t}')">&times;</button></span>`).join('')}
-                  <input type="text" class="tags-input" id="tagInput" placeholder="Nhập tag + Enter">
-                </div>
+            <div class="form-group">
+              <label class="form-label">Tags</label>
+              <div class="tags-container" id="tagsContainer">
+                ${(this.currentPost?.tags || []).map(t => `<span class="tag-item">${t}<button type="button" onclick="App.removeTag('${t}')">&times;</button></span>`).join('')}
+                <input type="text" class="tags-input" id="tagInput" placeholder="Nhập tag + Enter">
               </div>
             </div>
             <div class="form-group">
@@ -722,8 +739,8 @@ const App = {
                 <div class="post-item ${this.currentPost?.id === p.id ? 'active' : ''}" data-id="${p.id}">
                   <img src="${p.image || 'https://via.placeholder.com/80x50'}" alt="" class="post-thumb">
                   <div class="post-info">
-                    <h4>${p.title}</h4>
-                    <p>${p.category} • ${p.date}</p>
+                    <h4>${p.visibility === 'draft' ? '📝 ' : p.visibility === 'private' ? '🔒 ' : ''}${p.title}</h4>
+                    <p>${p.category} • ${p.date} • ${p.visibility === 'public' ? '🌐 Công khai' : p.visibility === 'private' ? '🔒 Riêng tư' : '📝 Bản nháp'}</p>
                   </div>
                   <div class="post-actions">
                     <button title="Sửa" onclick="App.editPost('${p.id}')"><i class="fa-solid fa-pen"></i></button>
@@ -823,13 +840,14 @@ const App = {
     
     const title = document.getElementById('title').value.trim();
     const category = document.getElementById('category').value;
+    const visibility = document.getElementById('visibility').value;
     const excerpt = document.getElementById('excerpt').value.trim();
     const image = document.getElementById('image').value.trim();
     const readTime = parseInt(document.getElementById('readTime').value) || 5;
     const featured = document.getElementById('featured').checked;
     const content = document.getElementById('content').value.trim();
 
-    console.log('Form values:', { title, category, excerpt, readTime, featured, contentLength: content.length });
+    console.log('Form values:', { title, category, visibility, excerpt, readTime, featured, contentLength: content.length });
 
     if (!title || !category || !excerpt || !content) {
       console.log('Validation failed - missing required fields');
@@ -840,6 +858,7 @@ const App = {
     const post = {
       id: this.editMode ? this.currentPost.id : this.generateId(title),
       title, slug: this.generateId(title), excerpt, content, category,
+      visibility: visibility || 'public',
       tags: this.tags.length ? this.tags : (this.currentPost?.tags || []),
       image: image || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format',
       author: 'Đông Dev',

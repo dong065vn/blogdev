@@ -1956,7 +1956,10 @@
           const snapshot = await get(ref(database, 'posts'));
           if (snapshot.exists()) {
             const data = snapshot.val();
-            posts = Object.values(data).sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Chỉ hiển thị bài viết public (hoặc không có visibility = mặc định public)
+            posts = Object.values(data)
+              .filter(p => !p.visibility || p.visibility === 'public')
+              .sort((a, b) => new Date(b.date) - new Date(a.date));
             console.log('Blog loaded from Firebase:', posts.length);
           }
         } catch (fbErr) {
@@ -1968,7 +1971,8 @@
         if (!posts || posts.length === 0) {
           const response = await fetch('blog/posts.json');
           const data = await response.json();
-          posts = data.posts || [];
+          // Chỉ hiển thị bài viết public
+          posts = (data.posts || []).filter(p => !p.visibility || p.visibility === 'public');
           console.log('Blog loaded from local JSON:', posts.length);
         }
         

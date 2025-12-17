@@ -677,12 +677,27 @@
           return;
         }
 
+        // Kiểm tra quyền hiển thị - chỉ cho xem bài public
+        // Bài private/draft cần đăng nhập admin
+        if (post.visibility && post.visibility !== 'public') {
+          document.getElementById('article').innerHTML = `
+            <div class="article-header">
+              <h1 class="article-title">🔒 Bài viết không khả dụng</h1>
+              <p style="color: var(--text-muted);">Bài viết này ${post.visibility === 'draft' ? 'đang ở chế độ bản nháp' : 'được đặt ở chế độ riêng tư'} và không thể xem công khai.</p>
+              <a href="../index.html#blog" style="color: var(--neon-cyan); margin-top: 20px; display: inline-block;">
+                ← Quay lại trang chủ
+              </a>
+            </div>
+          `;
+          return;
+        }
+
         // Update page title
         document.title = `${post.title} - Đông Dev`;
 
-        // Get related posts (same category, exclude current)
+        // Get related posts (same category, exclude current, only public)
         const relatedPosts = posts
-          .filter(p => p.id !== post.id)
+          .filter(p => p.id !== post.id && (!p.visibility || p.visibility === 'public'))
           .slice(0, 3);
 
         // Render article with content
