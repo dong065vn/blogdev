@@ -914,14 +914,14 @@
     @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
     /* Section Base */
-    section { padding: 100px 0; position: relative; z-index: 2; }
-    .section-header { text-align: center; margin-bottom: 60px; }
+    section { padding: 80px 0; position: relative; z-index: 2; }
+    .section-header { text-align: center; margin-bottom: 48px; display: flex; flex-direction: column; align-items: center; }
     .section-label {
-      display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 20px;
       background: rgba(196, 113, 237, 0.1); 
       border: 1px solid rgba(196, 113, 237, 0.3);
       border-radius: 100px; font-weight: 500; font-size: 0.85rem; 
-      color: var(--iris-purple); margin-bottom: 20px;
+      color: var(--iris-purple); margin-bottom: 16px;
       backdrop-filter: blur(10px);
     }
     .section-title { font-family: var(--font-heading); font-size: clamp(2.25rem, 4vw, 3rem); font-weight: 800; }
@@ -1083,17 +1083,17 @@
         <div class="stat-card">
           <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
           <div class="stat-value" data-count="5">0</div>
-          <div class="stat-label">Years Experience</div>
+          <div class="stat-label">Năm kinh nghiệm</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon"><i class="fa-solid fa-folder-open"></i></div>
           <div class="stat-value" data-count="20">0</div>
-          <div class="stat-label">Projects Done</div>
+          <div class="stat-label">Dự án hoàn thành</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
           <div class="stat-value" data-count="10">0</div>
-          <div class="stat-label">Technologies</div>
+          <div class="stat-label">Công nghệ</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon"><i class="fa-solid fa-code-commit"></i></div>
@@ -1128,8 +1128,8 @@
   <section id="about">
     <div class="container">
       <div class="section-header">
-        <span class="section-label"><i class="fa-solid fa-user"></i> About Me</span>
-        <h2 class="section-title">Know Me Better</h2>
+        <span class="section-label"><i class="fa-solid fa-user"></i> Giới thiệu</span>
+        <h2 class="section-title">Về tôi</h2>
       </div>
       <div class="about-grid">
         <div class="about-card">
@@ -1158,8 +1158,8 @@
   <section id="skills">
     <div class="container">
       <div class="section-header">
-        <span class="section-label"><i class="fa-solid fa-code"></i> My Skills</span>
-        <h2 class="section-title">What I Do Best</h2>
+        <span class="section-label"><i class="fa-solid fa-code"></i> Kỹ năng</span>
+        <h2 class="section-title">Những gì tôi làm tốt nhất</h2>
       </div>
       <div class="skills-bento">
         <div class="skill-card large">
@@ -1195,8 +1195,8 @@
   <section id="projects">
     <div class="container">
       <div class="section-header">
-        <span class="section-label"><i class="fa-solid fa-rocket"></i> My Work</span>
-        <h2 class="section-title">Featured Projects</h2>
+        <span class="section-label"><i class="fa-solid fa-rocket"></i> Dự án</span>
+        <h2 class="section-title">Các dự án nổi bật</h2>
       </div>
       <div class="projects-grid">
         <div class="project-card">
@@ -1346,7 +1346,7 @@
     <div class="container">
       <div class="section-header">
         <span class="section-label"><i class="fa-solid fa-pen-nib"></i> Blog</span>
-        <h2 class="section-title">Latest Articles</h2>
+        <h2 class="section-title">Bài viết mới nhất</h2>
       </div>
       <div class="blog-grid" id="blogGrid">
         <!-- Blog posts will be loaded dynamically from blog/posts.json -->
@@ -1356,7 +1356,7 @@
         </div>
       </div>
       <div class="blog-view-all">
-        <a href="blog/post.html" class="btn-view-all">View All Articles <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="blog/post.html" class="btn-view-all">Xem tất cả bài viết <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </div>
   </section>
@@ -1713,13 +1713,13 @@
   <section id="contact" class="contact-section">
     <div class="container">
       <div class="section-header">
-        <span class="section-label"><i class="fa-solid fa-envelope"></i> Get in Touch</span>
-        <h2 class="section-title">Let's Work Together</h2>
+        <span class="section-label"><i class="fa-solid fa-envelope"></i> Liên hệ</span>
+        <h2 class="section-title">Hãy làm việc cùng nhau</h2>
       </div>
       <div class="contact-grid">
         <div class="contact-info">
-          <h3>Contact Info</h3>
-          <p>Feel free to reach out. I'm always open to discussing new projects and opportunities.</p>
+          <h3>Thông tin liên hệ</h3>
+          <p>Hãy liên hệ với tôi. Tôi luôn sẵn sàng thảo luận về các dự án và cơ hội mới.</p>
           <div class="contact-methods">
             <a href="tel:+84372837802" class="contact-method">
               <i class="fa-solid fa-phone"></i>
@@ -1735,14 +1735,14 @@
             </a>
           </div>
         </div>
-        <form class="contact-form" onsubmit="event.preventDefault(); alert('Thanks! Message sent.');">
+        <form class="contact-form" onsubmit="event.preventDefault(); alert('Cảm ơn! Tin nhắn đã được gửi.');">
           <div class="form-row">
-            <div class="form-group"><label for="name">Your Name</label><input type="text" id="name" placeholder="John Doe" required></div>
-            <div class="form-group"><label for="email">Your Email</label><input type="email" id="email" placeholder="john@example.com" required></div>
+            <div class="form-group"><label for="name">Họ tên</label><input type="text" id="name" placeholder="Nguyễn Văn A" required></div>
+            <div class="form-group"><label for="email">Email</label><input type="email" id="email" placeholder="email@example.com" required></div>
           </div>
-          <div class="form-group"><label for="subject">Subject</label><input type="text" id="subject" placeholder="Project Inquiry"></div>
-          <div class="form-group"><label for="message">Message</label><textarea id="message" placeholder="Tell me about your project..." required></textarea></div>
-          <button type="submit" class="btn-submit"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+          <div class="form-group"><label for="subject">Tiêu đề</label><input type="text" id="subject" placeholder="Yêu cầu dự án"></div>
+          <div class="form-group"><label for="message">Nội dung</label><textarea id="message" placeholder="Mô tả về dự án của bạn..." required></textarea></div>
+          <button type="submit" class="btn-submit"><i class="fa-solid fa-paper-plane"></i> Gửi tin nhắn</button>
         </form>
       </div>
     </div>
