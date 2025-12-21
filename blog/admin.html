@@ -191,20 +191,34 @@
       padding: 16px; background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-sm);
-      transition: all 0.3s ease; cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     }
-    .post-item:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15); }
+    .post-item:hover { 
+      transform: translateY(-12px) scale(1.02);
+      background: rgba(255, 255, 255, 0.06); 
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4), 0 0 20px rgba(177, 74, 237, 0.5);
+    }
     .post-item.active { border-color: var(--neon-purple); background: rgba(177, 74, 237, 0.1); }
     .post-thumb {
       width: 80px; height: 50px; border-radius: 8px;
       object-fit: cover; flex-shrink: 0;
+      overflow: hidden;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .post-item:hover .post-thumb {
+      transform: scale(1.1);
     }
     .post-info { flex: 1; min-width: 0; }
     .post-info h4 {
       font-size: 0.95rem; font-weight: 600;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       margin-bottom: 4px;
+      transition: color 0.3s ease;
     }
+    .post-item:hover .post-info h4 { color: var(--iris-purple); }
     .post-info p { font-size: 0.8rem; color: var(--text-muted); }
     
     /* Visibility badges */

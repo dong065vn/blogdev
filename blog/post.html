@@ -421,14 +421,26 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: all 0.3s;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     }
     .related-card:hover {
-      transform: translateY(-5px);
-      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-12px) scale(1.02);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4), 0 0 20px rgba(177, 74, 237, 0.5);
     }
     .related-card img {
       width: 100%; aspect-ratio: 16/9; object-fit: cover; object-position: center center;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .related-card:hover img {
+      transform: scale(1.1);
+    }
+    .related-card h4 {
+      transition: color 0.3s ease;
+    }
+    .related-card:hover h4 {
+      color: var(--iris-purple);
     }
     .related-card.has-person img { object-position: center 25%; }
     .related-card.has-face img { object-position: center 15%; }
