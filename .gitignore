@@ -43,3 +43,11 @@ logs/
 # Vercel
 # =========================
 .vercel
+
+# =========================
+# Skill files (không push)
+# =========================
+*.skill.md
+SKILL_*.md
+vibecode-*.md
+cors.json
