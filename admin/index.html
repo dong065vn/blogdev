@@ -41,8 +41,8 @@
         <a href="#" class="nav-item" data-section="hero"><i class="fa-solid fa-home"></i><span>Hero Section</span></a>
         <a href="#" class="nav-item" data-section="stats"><i class="fa-solid fa-chart-bar"></i><span>Thống kê</span></a>
         <a href="#" class="nav-item" data-section="skills"><i class="fa-solid fa-code"></i><span>Kỹ năng</span></a>
-        <a href="#" class="nav-item" data-section="about"><i class="fa-solid fa-address-card"></i><span>About
-            Me</span></a>
+        <a href="#" class="nav-item" data-section="about"><i class="fa-solid fa-address-card"></i><span>Về
+            tôi</span></a>
         <a href="#" class="nav-item" data-section="projects"><i class="fa-solid fa-folder"></i><span>Dự án</span></a>
         <a href="#" class="nav-item" data-section="social"><i class="fa-solid fa-share-nodes"></i><span>Mạng xã
             hội</span></a>
@@ -1034,7 +1034,17 @@
 
     loadConfig() {
       const saved = localStorage.getItem('portfolio_config');
-      this.config = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultConfig));
+      const defaults = JSON.parse(JSON.stringify(defaultConfig));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Deep merge: fill in missing keys from defaults
+        for (const key of Object.keys(defaults)) {
+          if (!(key in parsed)) parsed[key] = defaults[key];
+        }
+        this.config = parsed;
+      } else {
+        this.config = defaults;
+      }
     },
 
     saveConfig() {
@@ -1073,7 +1083,7 @@
 
     renderSection(section) {
       this.currentSection = section;
-      const titles = { profile: 'Thông tin cá nhân', hero: 'Hero Section', stats: 'Thống kê', skills: 'Kỹ năng', about: 'About Me', projects: 'Dự án', social: 'Mạng xã hội', images: 'Hình ảnh' };
+      const titles = { profile: 'Thông tin cá nhân', hero: 'Hero Section', stats: 'Thống kê', skills: 'Kỹ năng', about: 'Về tôi', projects: 'Dự án', social: 'Mạng xã hội', images: 'Hình ảnh' };
       document.getElementById('pageTitle').textContent = titles[section] || section;
       const content = document.getElementById('contentArea');
 
@@ -1368,7 +1378,7 @@
       const a = this.config.about;
       return `
       <div class="card">
-        <div class="card-header"><h2 class="card-title"><i class="fa-solid fa-address-card"></i> About Me</h2></div>
+        <div class="card-header"><h2 class="card-title"><i class="fa-solid fa-address-card"></i> Về tôi</h2></div>
         <form id="aboutForm" class="form-grid">
           <div class="form-group full">
             <label class="form-label">Giới thiệu bản thân</label>
