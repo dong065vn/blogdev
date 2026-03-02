@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com;">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta http-equiv="X-Frame-Options" content="DENY">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Portfolio Admin - Đông Dev</title>
   <link rel="icon" href="../assets/favicon.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="../js/security.js"></script>
 </head>
+
 <body>
   <!-- Loading overlay while checking auth -->
-  <div id="authLoading" style="position:fixed;inset:0;background:#0a0a14;display:flex;align-items:center;justify-content:center;z-index:9999;">
+  <div id="authLoading"
+    style="position:fixed;inset:0;background:#0a0a14;display:flex;align-items:center;justify-content:center;z-index:9999;">
     <div style="text-align:center;color:#f5f5ff;">
       <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;margin-bottom:16px;display:block;"></i>
       <p>Đang xác thực...</p>
@@ -30,12 +36,14 @@
         <button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
       </div>
       <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" data-section="profile"><i class="fa-solid fa-user"></i><span>Thông tin cá nhân</span></a>
+        <a href="#" class="nav-item active" data-section="profile"><i class="fa-solid fa-user"></i><span>Thông tin cá
+            nhân</span></a>
         <a href="#" class="nav-item" data-section="hero"><i class="fa-solid fa-home"></i><span>Hero Section</span></a>
         <a href="#" class="nav-item" data-section="stats"><i class="fa-solid fa-chart-bar"></i><span>Thống kê</span></a>
         <a href="#" class="nav-item" data-section="skills"><i class="fa-solid fa-code"></i><span>Kỹ năng</span></a>
         <a href="#" class="nav-item" data-section="projects"><i class="fa-solid fa-folder"></i><span>Dự án</span></a>
-        <a href="#" class="nav-item" data-section="social"><i class="fa-solid fa-share-nodes"></i><span>Mạng xã hội</span></a>
+        <a href="#" class="nav-item" data-section="social"><i class="fa-solid fa-share-nodes"></i><span>Mạng xã
+            hội</span></a>
         <a href="#" class="nav-item" data-section="images"><i class="fa-solid fa-image"></i><span>Hình ảnh</span></a>
         <a href="../blog/admin.html" class="nav-item"><i class="fa-solid fa-pen-nib"></i><span>Blog</span></a>
       </nav>
@@ -48,505 +56,1042 @@
         <h1 id="pageTitle">Thông tin cá nhân</h1>
         <div class="header-actions">
           <button class="btn btn-primary" id="btnExport"><i class="fa-solid fa-download"></i> Export Config</button>
-          <button class="btn btn-secondary" id="btnLogout" style="margin-left: 8px;"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+          <button class="btn btn-secondary" id="btnLogout" style="margin-left: 8px;"><i
+              class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
         </div>
       </header>
       <div class="content-area" id="contentArea"></div>
     </main>
   </div>
 </body>
+
 </html>
 
 <style>
-:root {
-  --bg-dark: #0a0a14;
-  --bg-card: rgba(255, 255, 255, 0.03);
-  --text-primary: #f5f5ff;
-  --text-secondary: rgba(245, 245, 255, 0.75);
-  --text-muted: rgba(245, 245, 255, 0.5);
-  --neon-purple: #b14aed;
-  --neon-blue: #00b4ff;
-  --neon-cyan: #00ffea;
-  --neon-pink: #ff2d75;
-  --iris-purple: #a78bfa;
-  --success: #00ff88;
-  --error: #ff2d75;
-  --warning: #fbbf24;
-  --gradient-primary: linear-gradient(135deg, #ff2d75 0%, #b14aed 30%, #00b4ff 60%, #00ffea 100%);
-  --sidebar-width: 260px;
-  --header-height: 70px;
-  --font-body: 'DM Sans', sans-serif;
-  --radius: 16px;
-  --radius-sm: 10px;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-body); background: var(--bg-dark); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
-a { color: inherit; text-decoration: none; }
+  :root {
+    --bg-dark: #0a0a14;
+    --bg-card: rgba(255, 255, 255, 0.03);
+    --text-primary: #f5f5ff;
+    --text-secondary: rgba(245, 245, 255, 0.75);
+    --text-muted: rgba(245, 245, 255, 0.5);
+    --neon-purple: #b14aed;
+    --neon-blue: #00b4ff;
+    --neon-cyan: #00ffea;
+    --neon-pink: #ff2d75;
+    --iris-purple: #a78bfa;
+    --success: #00ff88;
+    --error: #ff2d75;
+    --warning: #fbbf24;
+    --gradient-primary: linear-gradient(135deg, #ff2d75 0%, #b14aed 30%, #00b4ff 60%, #00ffea 100%);
+    --sidebar-width: 260px;
+    --header-height: 70px;
+    --font-body: 'DM Sans', sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
 
-.mesh-bg {
-  position: fixed; inset: 0; z-index: -1;
-  background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 50%, #050510 100%);
-}
-.mesh-bg::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 20% 20%, rgba(177, 74, 237, 0.05) 0%, transparent 50%),
-              radial-gradient(ellipse at 80% 80%, rgba(0, 180, 255, 0.04) 0%, transparent 50%);
-}
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-.admin-wrapper { display: flex; min-height: 100vh; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
 
-/* Sidebar */
-.sidebar {
-  width: var(--sidebar-width); background: rgba(10, 10, 20, 0.95);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
-  backdrop-filter: blur(20px);
-}
-.sidebar-header {
-  padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.logo { font-size: 1.3rem; font-weight: 700; }
-.logo .dot { color: var(--neon-cyan); }
-.sidebar-toggle { display: none; background: none; border: none; color: var(--text-primary); font-size: 1.2rem; cursor: pointer; }
-.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
-.nav-item {
-  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
-  border-radius: var(--radius-sm); color: var(--text-secondary);
-  transition: all 0.3s; margin-bottom: 4px;
-}
-.nav-item i { width: 20px; text-align: center; font-size: 1rem; }
-.nav-item:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
-.nav-item.active { background: rgba(177, 74, 237, 0.15); color: var(--text-primary); border-left: 3px solid var(--neon-purple); }
-.sidebar-footer { padding: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
-.btn-back {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: var(--radius-sm);
-  color: var(--text-secondary); transition: all 0.3s;
-}
-.btn-back:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-/* Main */
-.main-content { flex: 1; margin-left: var(--sidebar-width); min-height: 100vh; }
-.main-header {
-  height: var(--header-height); padding: 0 32px;
-  background: rgba(10, 10, 20, 0.9); backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 50;
-}
-.main-header h1 { font-size: 1.4rem; font-weight: 600; }
-.content-area { padding: 32px; }
+  .mesh-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, #0a0a14 0%, #0f0f1a 50%, #050510 100%);
+  }
+
+  .mesh-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(177, 74, 237, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(0, 180, 255, 0.04) 0%, transparent 50%);
+  }
+
+  .admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: rgba(10, 10, 20, 0.95);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .logo .dot {
+    color: var(--neon-cyan);
+  }
+
+  .sidebar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    overflow-y: auto;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    transition: all 0.3s;
+    margin-bottom: 4px;
+  }
+
+  .nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+  }
+
+  .nav-item.active {
+    background: rgba(177, 74, 237, 0.15);
+    color: var(--text-primary);
+    border-left: 3px solid var(--neon-purple);
+  }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    transition: all 0.3s;
+  }
+
+  .btn-back:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+  }
+
+  /* Main */
+  .main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+  }
+
+  .main-header {
+    height: var(--header-height);
+    padding: 0 32px;
+    background: rgba(10, 10, 20, 0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .main-header h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .content-area {
+    padding: 32px;
+  }
 </style>
 
 <style>
-/* Buttons */
-.btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 20px; font-weight: 600; font-size: 0.9rem;
-  border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.3s;
-}
-.btn-primary { background: var(--gradient-primary); color: white; box-shadow: 0 4px 15px rgba(177, 74, 237, 0.3); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(177, 74, 237, 0.4); }
-.btn-secondary { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border: 1px solid rgba(255, 255, 255, 0.15); }
-.btn-secondary:hover { background: rgba(255, 255, 255, 0.12); }
-.btn-danger { background: rgba(255, 45, 117, 0.2); color: var(--neon-pink); border: 1px solid rgba(255, 45, 117, 0.3); }
-.btn-success { background: rgba(0, 255, 136, 0.2); color: var(--success); border: 1px solid rgba(0, 255, 136, 0.3); }
-.btn-sm { padding: 8px 14px; font-size: 0.85rem; }
-.btn-icon { width: 40px; height: 40px; padding: 0; justify-content: center; }
-
-/* Cards */
-.card {
-  background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius); padding: 24px;
-  margin-bottom: 24px;
-}
-.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-.card-title { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-.card-title i { color: var(--iris-purple); }
-
-/* Form */
-.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.form-group { margin-bottom: 20px; }
-.form-group.full { grid-column: 1 / -1; }
-.form-label { display: block; font-weight: 500; font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px; }
-.form-label span { color: var(--neon-pink); }
-.form-input, .form-textarea, .form-select {
-  width: 100%; padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-sm); color: var(--text-primary); font-family: inherit; font-size: 0.95rem;
-  transition: all 0.3s;
-}
-.form-input:focus, .form-textarea:focus, .form-select:focus {
-  outline: none; border-color: var(--neon-purple);
-  background: rgba(177, 74, 237, 0.05); box-shadow: 0 0 20px rgba(177, 74, 237, 0.1);
-}
-.form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
-.form-textarea { min-height: 120px; resize: vertical; }
-.form-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-/* Image Upload */
-.image-upload {
-  border: 2px dashed rgba(255, 255, 255, 0.15); border-radius: var(--radius);
-  padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s;
-}
-.image-upload:hover { border-color: var(--neon-purple); background: rgba(177, 74, 237, 0.05); }
-.image-upload i { font-size: 2.5rem; color: var(--text-muted); margin-bottom: 12px; }
-.image-upload p { color: var(--text-secondary); margin-bottom: 8px; }
-.image-upload span { font-size: 0.85rem; color: var(--text-muted); }
-.image-preview { width: 100%; max-width: 200px; border-radius: var(--radius-sm); margin-top: 16px; }
-
-/* List Items */
-.list-item {
-  display: flex; align-items: center; gap: 16px; padding: 16px;
-  background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-sm); margin-bottom: 12px; transition: all 0.3s;
-}
-.list-item:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15); }
-.list-item-icon { width: 50px; height: 50px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
-.list-item-content { flex: 1; min-width: 0; }
-.list-item-content h4 { font-size: 1rem; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.list-item-content p { font-size: 0.85rem; color: var(--text-muted); }
-.list-item-actions { display: flex; gap: 8px; }
-.list-item-actions button { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-secondary); cursor: pointer; transition: all 0.3s; }
-.list-item-actions button:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
-.list-item-actions .btn-delete:hover { background: rgba(255, 45, 117, 0.2); color: var(--neon-pink); }
-
-/* Toast */
-.toast { position: fixed; bottom: 24px; right: 24px; padding: 16px 24px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 12px; font-weight: 500; z-index: 1000; animation: slideIn 0.3s ease; }
-.toast.success { background: rgba(0, 255, 136, 0.15); border: 1px solid var(--success); color: var(--success); }
-.toast.error { background: rgba(255, 45, 117, 0.15); border: 1px solid var(--neon-pink); color: var(--neon-pink); }
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-/* Modal */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
-.modal-overlay.active { opacity: 1; visibility: visible; }
-.modal { background: var(--bg-dark); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--radius); padding: 24px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.modal-header h3 { font-size: 1.2rem; }
-.modal-close { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
-.modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
-
-/* ========== RESPONSIVE ========== */
-
-/* Tablet */
-@media (max-width: 900px) {
-  .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
-  .sidebar.open { transform: translateX(0); }
-  .sidebar-toggle { display: block; }
-  .main-content { margin-left: 0; }
-  .main-header { padding: 0 16px; }
-  .content-area { padding: 16px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
-  .card { padding: 20px; }
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-  .main-header { 
-    height: auto;
-    padding: 12px 16px;
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
-  .main-header h1 { 
-    font-size: 1.2rem;
-    text-align: center;
-  }
-  .header-actions { 
-    display: flex;
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
     gap: 8px;
-    justify-content: center;
-  }
-  .header-actions .btn { 
-    flex: 1;
-    justify-content: center;
-    padding: 10px 14px;
-    font-size: 0.85rem;
-  }
-  .content-area { padding: 12px; }
-  .card { 
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 16px;
-  }
-  .card-header { 
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-  }
-  .card-title { font-size: 1rem; }
-  .form-group { margin-bottom: 16px; }
-  .form-label { font-size: 0.85rem; margin-bottom: 6px; }
-  .form-input, .form-textarea, .form-select { 
-    padding: 12px 14px;
+    padding: 12px 20px;
+    font-weight: 600;
     font-size: 0.9rem;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
   }
-  .form-textarea { min-height: 100px; }
-  .form-hint { font-size: 0.75rem; }
-  .btn { 
-    padding: 12px 16px;
+
+  .btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(177, 74, 237, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(177, 74, 237, 0.4);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .btn-danger {
+    background: rgba(255, 45, 117, 0.2);
+    color: var(--neon-pink);
+    border: 1px solid rgba(255, 45, 117, 0.3);
+  }
+
+  .btn-success {
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--success);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+  }
+
+  .btn-sm {
+    padding: 8px 14px;
     font-size: 0.85rem;
-    border-radius: 8px;
   }
-  .btn-sm { padding: 10px 14px; }
-  .btn-icon { width: 36px; height: 36px; }
-  
-  /* List items mobile */
-  .list-item { 
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 14px;
-  }
-  .list-item-icon { 
-    width: 44px; 
-    height: 44px;
-    font-size: 1.1rem;
-  }
-  .list-item-content { width: 100%; }
-  .list-item-content h4 { 
-    font-size: 0.95rem;
-    white-space: normal;
-  }
-  .list-item-content p { font-size: 0.8rem; }
-  .list-item-actions { 
-    width: 100%;
-    justify-content: flex-end;
-  }
-  .list-item-actions button { 
+
+  .btn-icon {
     width: 40px;
     height: 40px;
-  }
-  
-  /* Image upload mobile */
-  .image-upload { padding: 24px 16px; }
-  .image-upload i { font-size: 2rem; }
-  .image-upload p { font-size: 0.9rem; }
-  .image-preview { max-width: 150px; }
-  
-  /* Toast mobile */
-  .toast { 
-    bottom: 16px;
-    right: 16px;
-    left: 16px;
-    padding: 14px 16px;
-    font-size: 0.9rem;
-  }
-  
-  /* Modal mobile */
-  .modal { 
-    padding: 20px;
-    margin: 16px;
-    max-width: calc(100% - 32px);
-  }
-  .modal-header h3 { font-size: 1.1rem; }
-  .modal-actions { 
-    flex-direction: column-reverse;
-    gap: 10px;
-  }
-  .modal-actions .btn { 
-    width: 100%;
+    padding: 0;
     justify-content: center;
   }
-  
-  /* Sidebar mobile */
-  .sidebar { width: 280px; }
-  .sidebar-header { padding: 16px; }
-  .logo { font-size: 1.1rem; }
-  .sidebar-nav { padding: 12px 8px; }
-  .nav-item { 
-    padding: 12px 14px;
+
+  /* Cards */
+  .card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-title i {
+    color: var(--iris-purple);
+  }
+
+  /* Form */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group.full {
+    grid-column: 1 / -1;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 500;
     font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
   }
-  .sidebar-footer { padding: 12px; }
-  .btn-back { padding: 10px; font-size: 0.9rem; }
-}
 
-/* Small mobile */
-@media (max-width: 380px) {
-  .content-area { padding: 10px; }
-  .card { padding: 14px; }
-  .form-input, .form-textarea, .form-select { 
-    padding: 10px 12px;
+  .form-label span {
+    color: var(--neon-pink);
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: var(--neon-purple);
+    background: rgba(177, 74, 237, 0.05);
+    box-shadow: 0 0 20px rgba(177, 74, 237, 0.1);
+  }
+
+  .form-input::placeholder,
+  .form-textarea::placeholder {
+    color: var(--text-muted);
+  }
+
+  .form-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .form-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Image Upload */
+  .image-upload {
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .image-upload:hover {
+    border-color: var(--neon-purple);
+    background: rgba(177, 74, 237, 0.05);
+  }
+
+  .image-upload i {
+    font-size: 2.5rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .image-upload p {
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .image-upload span {
     font-size: 0.85rem;
+    color: var(--text-muted);
   }
-  .btn { padding: 10px 14px; font-size: 0.8rem; }
-  .main-header h1 { font-size: 1.1rem; }
-}
 
-/* Sidebar overlay for mobile */
-@media (max-width: 900px) {
-  .sidebar-overlay {
+  .image-preview {
+    width: 100%;
+    max-width: 200px;
+    border-radius: var(--radius-sm);
+    margin-top: 16px;
+  }
+
+  /* List Items */
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+    transition: all 0.3s;
+  }
+
+  .list-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .list-item-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .list-item-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .list-item-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .list-item-content p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .list-item-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .list-item-actions button {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .list-item-actions button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+  }
+
+  .list-item-actions .btn-delete:hover {
+    background: rgba(255, 45, 117, 0.2);
+    color: var(--neon-pink);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 16px 24px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+  }
+
+  .toast.success {
+    background: rgba(0, 255, 136, 0.15);
+    border: 1px solid var(--success);
+    color: var(--success);
+  }
+
+  .toast.error {
+    background: rgba(255, 45, 117, 0.15);
+    border: 1px solid var(--neon-pink);
+    color: var(--neon-pink);
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Modal */
+  .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 99;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
   }
-  .sidebar-overlay.active {
+
+  .modal-overlay.active {
     opacity: 1;
     visibility: visible;
   }
-}
 
-/* Safe area for notch devices */
-@supports (padding: max(0px)) {
-  .main-header {
-    padding-left: max(16px, env(safe-area-inset-left));
-    padding-right: max(16px, env(safe-area-inset-right));
+  .modal {
+    background: var(--bg-dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
   }
-  .content-area {
-    padding-left: max(12px, env(safe-area-inset-left));
-    padding-right: max(12px, env(safe-area-inset-right));
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
   }
-  .toast {
-    bottom: max(16px, env(safe-area-inset-bottom));
+
+  .modal-header h3 {
+    font-size: 1.2rem;
   }
-}
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* ========== RESPONSIVE ========== */
+
+  /* Tablet */
+  @media (max-width: 900px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-toggle {
+      display: block;
+    }
+
+    .main-content {
+      margin-left: 0;
+    }
+
+    .main-header {
+      padding: 0 16px;
+    }
+
+    .content-area {
+      padding: 16px;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      padding: 20px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .main-header {
+      height: auto;
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .main-header h1 {
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .header-actions .btn {
+      flex: 1;
+      justify-content: center;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+    }
+
+    .content-area {
+      padding: 12px;
+    }
+
+    .card {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+    }
+
+    .form-textarea {
+      min-height: 100px;
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+    }
+
+    .btn {
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+    }
+
+    .btn-sm {
+      padding: 10px 14px;
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    /* List items mobile */
+    .list-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .list-item-icon {
+      width: 44px;
+      height: 44px;
+      font-size: 1.1rem;
+    }
+
+    .list-item-content {
+      width: 100%;
+    }
+
+    .list-item-content h4 {
+      font-size: 0.95rem;
+      white-space: normal;
+    }
+
+    .list-item-content p {
+      font-size: 0.8rem;
+    }
+
+    .list-item-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .list-item-actions button {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* Image upload mobile */
+    .image-upload {
+      padding: 24px 16px;
+    }
+
+    .image-upload i {
+      font-size: 2rem;
+    }
+
+    .image-upload p {
+      font-size: 0.9rem;
+    }
+
+    .image-preview {
+      max-width: 150px;
+    }
+
+    /* Toast mobile */
+    .toast {
+      bottom: 16px;
+      right: 16px;
+      left: 16px;
+      padding: 14px 16px;
+      font-size: 0.9rem;
+    }
+
+    /* Modal mobile */
+    .modal {
+      padding: 20px;
+      margin: 16px;
+      max-width: calc(100% - 32px);
+    }
+
+    .modal-header h3 {
+      font-size: 1.1rem;
+    }
+
+    .modal-actions {
+      flex-direction: column-reverse;
+      gap: 10px;
+    }
+
+    .modal-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Sidebar mobile */
+    .sidebar {
+      width: 280px;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+    }
+
+    .logo {
+      font-size: 1.1rem;
+    }
+
+    .sidebar-nav {
+      padding: 12px 8px;
+    }
+
+    .nav-item {
+      padding: 12px 14px;
+      font-size: 0.9rem;
+    }
+
+    .sidebar-footer {
+      padding: 12px;
+    }
+
+    .btn-back {
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Small mobile */
+  @media (max-width: 380px) {
+    .content-area {
+      padding: 10px;
+    }
+
+    .card {
+      padding: 14px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+
+    .btn {
+      padding: 10px 14px;
+      font-size: 0.8rem;
+    }
+
+    .main-header h1 {
+      font-size: 1.1rem;
+    }
+  }
+
+  /* Sidebar overlay for mobile */
+  @media (max-width: 900px) {
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 99;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  /* Safe area for notch devices */
+  @supports (padding: max(0px)) {
+    .main-header {
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+    }
+
+    .content-area {
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+    }
+
+    .toast {
+      bottom: max(16px, env(safe-area-inset-bottom));
+    }
+  }
 </style>
 
 <script>
-// Global function for sidebar overlay
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('active');
-}
+  // Global function for sidebar overlay
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+  }
 </script>
 <script type="module">
-// Portfolio Config Data
-const defaultConfig = {
-  profile: {
-    name: "Đào Xuân Đông",
-    nickname: "Đông Dev",
-    title: "Full-stack Developer",
-    description: "Full-stack developer crafting elegant digital experiences with clean code, modern design, and a focus on performance & accessibility.",
-    phone: "+84 372 837 802",
-    email: "daodong204@gmail.com",
-    avatar: "assets/avatar.jpg",
-    cv: "assets/CV_DongDev.pdf"
-  },
-  hero: {
-    badge: "Available for work",
-    titleLine1: "Hi, I'm",
-    titleLine2: "Đông Dev",
-    ctaText: "Get in Touch",
-    cvText: "Download CV"
-  },
-  stats: [
-    { icon: "fa-calendar-check", value: 5, label: "Years Experience", color: "#ff5c8d" },
-    { icon: "fa-folder-open", value: 20, label: "Projects Done", color: "#38bdf8" },
-    { icon: "fa-layer-group", value: 10, label: "Technologies", color: "#a78bfa" },
-    { icon: "fa-code-commit", value: 500, label: "Git Commits", color: "#2dd4bf" }
-  ],
-  skills: [
-    { id: 1, title: "Frontend Development", icon: "fa-laptop-code", tags: ["HTML5", "CSS3", "JavaScript", "React", "Vue.js", "Tailwind"], large: true },
-    { id: 2, title: "Backend Development", icon: "fa-server", tags: ["Node.js", "Express", "Python", "REST API", "MongoDB", "PostgreSQL"], large: true },
-    { id: 3, title: "UI/UX Design", icon: "fa-palette", tags: ["Figma", "Adobe XD", "Prototyping"], large: false },
-    { id: 4, title: "Dev Tools", icon: "fa-wrench", tags: ["Git", "Docker", "VS Code"], large: false }
-  ],
-  projects: [
-    { id: 1, title: "Modern Portfolio", description: "A clean, responsive portfolio website with dark mode and smooth animations.", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800", tags: ["HTML", "CSS", "JavaScript"], demo: "#", github: "#" },
-    { id: 2, title: "Analytics Dashboard", description: "Real-time analytics dashboard with interactive charts and data visualization.", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800", tags: ["React", "Chart.js", "Node.js"], demo: "#", github: "#" },
-    { id: 3, title: "E-commerce Platform", description: "Full-featured online store with cart, checkout, and payment integration.", image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800", tags: ["Vue.js", "Express", "MongoDB"], demo: "#", github: "#" }
-  ],
-  social: [
-    { id: 1, name: "GitHub", icon: "fa-brands fa-github", url: "https://github.com/dong065vn", color: "#fff" },
-    { id: 2, name: "Facebook", icon: "fa-brands fa-facebook", url: "https://www.facebook.com/dong06.5.98.bg/", color: "#1877f2" },
-    { id: 3, name: "LinkedIn", icon: "fa-brands fa-linkedin-in", url: "#", color: "#0a66c2" },
-    { id: 4, name: "Twitter", icon: "fa-brands fa-x-twitter", url: "#", color: "#fff" },
-    { id: 5, name: "Zalo", icon: "fa-solid fa-comment", url: "https://zaloapp.com/qr/p/12v5mo2i6udrv", color: "#0068ff" }
-  ],
-  images: {
-    avatar: "assets/avatar.jpg",
-    favicon: "assets/favicon.png",
-    cv: "assets/CV_DongDev.pdf",
-    projectImages: []
-  }
-};
-
-// App State
-const App = {
-  config: null,
-  currentSection: 'profile',
-
-  init() {
-    this.loadConfig();
-    this.bindEvents();
-    this.renderSection('profile');
-  },
-
-  loadConfig() {
-    const saved = localStorage.getItem('portfolio_config');
-    this.config = saved ? JSON.parse(saved) : { ...defaultConfig };
-  },
-
-  saveConfig() {
-    localStorage.setItem('portfolio_config', JSON.stringify(this.config));
-    this.toast('Đã lưu thay đổi!', 'success');
-  },
-
-  bindEvents() {
-    document.querySelectorAll('.nav-item[data-section]').forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        const section = item.dataset.section;
-        this.renderSection(section);
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        item.classList.add('active');
-      });
-    });
-    document.getElementById('btnExport').addEventListener('click', () => this.exportConfig());
-    document.getElementById('btnLogout')?.addEventListener('click', () => this.logout());
-    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('open');
-      document.getElementById('sidebarOverlay').classList.toggle('active');
-    });
-  },
-
-  logout() {
-    sessionStorage.removeItem('admin_token');
-    sessionStorage.removeItem('admin_expires');
-    window.location.href = 'auth.html';
-  },
-
-  // Security: Escape HTML to prevent XSS
-  esc(str) {
-    return Security ? Security.escapeHtml(str) : String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  },
-
-  renderSection(section) {
-    this.currentSection = section;
-    const titles = { profile: 'Thông tin cá nhân', hero: 'Hero Section', stats: 'Thống kê', skills: 'Kỹ năng', projects: 'Dự án', social: 'Mạng xã hội', images: 'Hình ảnh' };
-    document.getElementById('pageTitle').textContent = titles[section] || section;
-    const content = document.getElementById('contentArea');
-    
-    switch(section) {
-      case 'profile': content.innerHTML = this.renderProfile(); break;
-      case 'hero': content.innerHTML = this.renderHero(); break;
-      case 'stats': content.innerHTML = this.renderStats(); break;
-      case 'skills': content.innerHTML = this.renderSkills(); break;
-      case 'projects': content.innerHTML = this.renderProjects(); break;
-      case 'social': content.innerHTML = this.renderSocial(); break;
-      case 'images': content.innerHTML = this.renderImages(); break;
+  // Portfolio Config Data
+  const defaultConfig = {
+    profile: {
+      name: "Đào Xuân Đông",
+      nickname: "Đông Dev",
+      title: "Full-stack Developer",
+      description: "Full-stack developer crafting elegant digital experiences with clean code, modern design, and a focus on performance & accessibility.",
+      phone: "+84 372 837 802",
+      email: "daodong204@gmail.com",
+      avatar: "assets/avatar.jpg",
+      cv: "assets/CV_DongDev.pdf"
+    },
+    hero: {
+      badge: "Available for work",
+      titleLine1: "Hi, I'm",
+      titleLine2: "Đông Dev",
+      ctaText: "Get in Touch",
+      cvText: "Download CV"
+    },
+    stats: [
+      { icon: "fa-calendar-check", value: 5, label: "Years Experience", color: "#ff5c8d" },
+      { icon: "fa-folder-open", value: 20, label: "Projects Done", color: "#38bdf8" },
+      { icon: "fa-layer-group", value: 10, label: "Technologies", color: "#a78bfa" },
+      { icon: "fa-code-commit", value: 500, label: "Git Commits", color: "#2dd4bf" }
+    ],
+    skills: [
+      { id: 1, title: "Frontend Development", icon: "fa-laptop-code", tags: ["HTML5", "CSS3", "JavaScript", "React", "Vue.js", "Tailwind"], large: true },
+      { id: 2, title: "Backend Development", icon: "fa-server", tags: ["Node.js", "Express", "Python", "REST API", "MongoDB", "PostgreSQL"], large: true },
+      { id: 3, title: "UI/UX Design", icon: "fa-palette", tags: ["Figma", "Adobe XD", "Prototyping"], large: false },
+      { id: 4, title: "Dev Tools", icon: "fa-wrench", tags: ["Git", "Docker", "VS Code"], large: false }
+    ],
+    projects: [
+      { id: 1, title: "Modern Portfolio", description: "A clean, responsive portfolio website with dark mode and smooth animations.", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800", tags: ["HTML", "CSS", "JavaScript"], demo: "#", github: "#" },
+      { id: 2, title: "Analytics Dashboard", description: "Real-time analytics dashboard with interactive charts and data visualization.", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800", tags: ["React", "Chart.js", "Node.js"], demo: "#", github: "#" },
+      { id: 3, title: "E-commerce Platform", description: "Full-featured online store with cart, checkout, and payment integration.", image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800", tags: ["Vue.js", "Express", "MongoDB"], demo: "#", github: "#" }
+    ],
+    social: [
+      { id: 1, name: "GitHub", icon: "fa-brands fa-github", url: "https://github.com/dong065vn", color: "#fff" },
+      { id: 2, name: "Facebook", icon: "fa-brands fa-facebook", url: "https://www.facebook.com/dong06.5.98.bg/", color: "#1877f2" },
+      { id: 3, name: "LinkedIn", icon: "fa-brands fa-linkedin-in", url: "#", color: "#0a66c2" },
+      { id: 4, name: "Twitter", icon: "fa-brands fa-x-twitter", url: "#", color: "#fff" },
+      { id: 5, name: "Zalo", icon: "fa-solid fa-comment", url: "https://zaloapp.com/qr/p/12v5mo2i6udrv", color: "#0068ff" }
+    ],
+    images: {
+      avatar: "assets/avatar.jpg",
+      favicon: "assets/favicon.png",
+      cv: "assets/CV_DongDev.pdf",
+      projectImages: []
     }
-    this.bindFormEvents();
-  },
+  };
 
-  renderProfile() {
-    const p = this.config.profile;
-    return `
+  // App State
+  const App = {
+    config: null,
+    currentSection: 'profile',
+
+    init() {
+      this.loadConfig();
+      this.bindEvents();
+      this.renderSection('profile');
+    },
+
+    loadConfig() {
+      const saved = localStorage.getItem('portfolio_config');
+      this.config = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultConfig));
+    },
+
+    saveConfig() {
+      localStorage.setItem('portfolio_config', JSON.stringify(this.config));
+      this.toast('Đã lưu thay đổi!', 'success');
+    },
+
+    bindEvents() {
+      document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          const section = item.dataset.section;
+          this.renderSection(section);
+          document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+          item.classList.add('active');
+        });
+      });
+      document.getElementById('btnExport').addEventListener('click', () => this.exportConfig());
+      document.getElementById('btnLogout')?.addEventListener('click', () => this.logout());
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').classList.toggle('active');
+      });
+    },
+
+    logout() {
+      sessionStorage.removeItem('admin_token');
+      sessionStorage.removeItem('admin_expires');
+      window.location.href = 'auth.html';
+    },
+
+    // Security: Escape HTML to prevent XSS
+    esc(str) {
+      return Security ? Security.escapeHtml(str) : String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    },
+
+    renderSection(section) {
+      this.currentSection = section;
+      const titles = { profile: 'Thông tin cá nhân', hero: 'Hero Section', stats: 'Thống kê', skills: 'Kỹ năng', projects: 'Dự án', social: 'Mạng xã hội', images: 'Hình ảnh' };
+      document.getElementById('pageTitle').textContent = titles[section] || section;
+      const content = document.getElementById('contentArea');
+
+      switch (section) {
+        case 'profile': content.innerHTML = this.renderProfile(); break;
+        case 'hero': content.innerHTML = this.renderHero(); break;
+        case 'stats': content.innerHTML = this.renderStats(); break;
+        case 'skills': content.innerHTML = this.renderSkills(); break;
+        case 'projects': content.innerHTML = this.renderProjects(); break;
+        case 'social': content.innerHTML = this.renderSocial(); break;
+        case 'images': content.innerHTML = this.renderImages(); break;
+      }
+      this.bindFormEvents();
+    },
+
+    renderProfile() {
+      const p = this.config.profile;
+      const avatarSrc = this.config.images?.avatar || this.config.profile?.avatar || '';
+      return `
       <div class="card">
         <div class="card-header"><h2 class="card-title"><i class="fa-solid fa-user-circle"></i> Thông tin cơ bản</h2></div>
         <form id="profileForm" class="form-grid">
+          <div class="form-group full">
+            <label class="form-label"><i class="fa-solid fa-camera"></i> Ảnh đại diện</label>
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+              <div style="position:relative;width:100px;height:100px;border-radius:50%;overflow:hidden;border:3px solid rgba(177,74,237,0.4);flex-shrink:0;">
+                <img id="avatarPreview" src="${avatarSrc.startsWith('data:') ? avatarSrc : '../' + avatarSrc}" style="width:100%;height:100%;object-fit:cover;display:${avatarSrc ? 'block' : 'none'};" onerror="this.style.display='none'">
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(177,74,237,0.1);"><i class="fa-solid fa-user" style="font-size:2rem;color:var(--text-muted);"></i></div>
+              </div>
+              <div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="App.uploadImage('images.avatar','avatarPreview',null)"><i class="fa-solid fa-cloud-upload-alt"></i> Upload ảnh</button>
+                <p class="form-hint" style="margin-top:6px;">PNG, JPG, WebP (tối đa 5MB)</p>
+              </div>
+            </div>
+          </div>
           <div class="form-group">
             <label class="form-label">Họ và tên <span>*</span></label>
             <input type="text" class="form-input" name="name" value="${p.name}" required>
@@ -581,14 +1126,24 @@ const App = {
         </form>
       </div>
     `;
-  },
+    },
 
-  renderHero() {
-    const h = this.config.hero;
-    return `
+    renderHero() {
+      const h = this.config.hero;
+      const heroBg = this.config.hero?.backgroundImage || '';
+      return `
       <div class="card">
         <div class="card-header"><h2 class="card-title"><i class="fa-solid fa-home"></i> Hero Section</h2></div>
         <form id="heroForm" class="form-grid">
+          <div class="form-group full">
+            <label class="form-label"><i class="fa-solid fa-image"></i> Ảnh nền Hero</label>
+            <div class="image-upload" onclick="App.uploadImage('hero.backgroundImage','heroBgPreview',null)" style="padding:24px;">
+              <i class="fa-solid fa-cloud-upload-alt"></i>
+              <p>Click để upload ảnh nền</p>
+              <span>PNG, JPG, WebP (tối đa 5MB)</span>
+              <img id="heroBgPreview" src="${heroBg}" class="image-preview" style="max-width:400px;display:${heroBg ? 'block' : 'none'};margin:12px auto 0;" onerror="this.style.display='none'">
+            </div>
+          </div>
           <div class="form-group">
             <label class="form-label">Badge text</label>
             <input type="text" class="form-input" name="badge" value="${h.badge}">
@@ -616,10 +1171,10 @@ const App = {
         </form>
       </div>
     `;
-  },
+    },
 
-  renderStats() {
-    return `
+    renderStats() {
+      return `
       <div class="card">
         <div class="card-header">
           <h2 class="card-title"><i class="fa-solid fa-chart-bar"></i> Thống kê</h2>
@@ -642,10 +1197,10 @@ const App = {
         </div>
       </div>
     `;
-  },
+    },
 
-  renderSkills() {
-    return `
+    renderSkills() {
+      return `
       <div class="card">
         <div class="card-header">
           <h2 class="card-title"><i class="fa-solid fa-code"></i> Kỹ năng</h2>
@@ -668,10 +1223,10 @@ const App = {
         </div>
       </div>
     `;
-  },
+    },
 
-  renderProjects() {
-    return `
+    renderProjects() {
+      return `
       <div class="card">
         <div class="card-header">
           <h2 class="card-title"><i class="fa-solid fa-folder"></i> Dự án</h2>
@@ -694,10 +1249,10 @@ const App = {
         </div>
       </div>
     `;
-  },
+    },
 
-  renderSocial() {
-    return `
+    renderSocial() {
+      return `
       <div class="card">
         <div class="card-header">
           <h2 class="card-title"><i class="fa-solid fa-share-nodes"></i> Mạng xã hội</h2>
@@ -720,30 +1275,35 @@ const App = {
         </div>
       </div>
     `;
-  },
+    },
 
-  renderImages() {
-    return `
+    renderImages() {
+      const av = this.config.images?.avatar || '';
+      const avSrc = av.startsWith('data:') ? av : (av ? '../' + av : '');
+      const fv = this.config.images?.favicon || '';
+      const fvSrc = fv.startsWith('data:') ? fv : (fv ? '../' + fv : '');
+      const gallery = this.config.images?.gallery || [];
+      return `
       <div class="card">
         <div class="card-header"><h2 class="card-title"><i class="fa-solid fa-image"></i> Quản lý hình ảnh</h2></div>
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">Avatar</label>
-            <div class="image-upload" onclick="App.uploadImage('avatar')">
+            <label class="form-label"><i class="fa-solid fa-user-circle"></i> Avatar</label>
+            <div class="image-upload" onclick="App.uploadImage('avatar','imgAvPrev',null)">
               <i class="fa-solid fa-cloud-upload-alt"></i>
               <p>Click để upload ảnh</p>
-              <span>PNG, JPG (max 2MB)</span>
-              ${this.config.images.avatar ? `<img src="../${this.config.images.avatar}" class="image-preview">` : ''}
+              <span>PNG, JPG, WebP (tối đa 5MB)</span>
+              <img id="imgAvPrev" src="${avSrc}" class="image-preview" style="display:${av ? 'block' : 'none'};" onerror="this.style.display='none'">
             </div>
-            <input type="text" class="form-input" style="margin-top: 12px;" placeholder="Hoặc nhập URL ảnh" value="${this.config.images.avatar}" onchange="App.updateImageUrl('avatar', this.value)">
+            <input type="text" class="form-input" style="margin-top:12px;" placeholder="Hoặc nhập URL ảnh" value="${this.config.images.avatar}" onchange="App.updateImageUrl('avatar', this.value)">
           </div>
           <div class="form-group">
-            <label class="form-label">Favicon</label>
-            <div class="image-upload" onclick="App.uploadImage('favicon')">
+            <label class="form-label"><i class="fa-solid fa-icons"></i> Favicon</label>
+            <div class="image-upload" onclick="App.uploadImage('favicon','imgFvPrev',null)">
               <i class="fa-solid fa-cloud-upload-alt"></i>
               <p>Click để upload favicon</p>
               <span>PNG (32x32 hoặc 64x64)</span>
-              ${this.config.images.favicon ? `<img src="../${this.config.images.favicon}" class="image-preview" style="max-width: 64px;">` : ''}
+              <img id="imgFvPrev" src="${fvSrc}" class="image-preview" style="max-width:64px;display:${fv ? 'block' : 'none'};" onerror="this.style.display='none'">
             </div>
           </div>
         </div>
@@ -756,213 +1316,353 @@ const App = {
           <p class="form-hint">Đặt file PDF trong thư mục assets/</p>
         </div>
       </div>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fa-solid fa-images"></i> Thư viện ảnh</h2>
+          <button class="btn btn-secondary btn-sm" onclick="App.addGalleryImage()"><i class="fa-solid fa-plus"></i> Thêm ảnh</button>
+        </div>
+        <div id="galleryGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+          ${gallery.length === 0 ? '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px;"><i class="fa-solid fa-images" style="font-size:2rem;display:block;margin-bottom:12px;"></i>Chưa có ảnh nào. Nhấn "Thêm ảnh" để upload.</p>' : ''}
+          ${gallery.map((img, i) => `
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);overflow:hidden;transition:all 0.3s;">
+              <div style="position:relative;padding-top:66%;overflow:hidden;">
+                <img src="${img.url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 66%22><rect fill=%22%231a1a2e%22 width=%22100%22 height=%2266%22/><text x=%2250%22 y=%2233%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%228%22>No img</text></svg>'">
+                <div style="position:absolute;top:8px;right:8px;display:flex;gap:4px;">
+                  <button onclick="App.editGalleryImage(${i})" style="width:28px;height:28px;border-radius:6px;border:none;background:rgba(0,0,0,0.6);color:#fff;cursor:pointer;font-size:0.75rem;"><i class="fa-solid fa-pen"></i></button>
+                  <button onclick="App.deleteGalleryImage(${i})" style="width:28px;height:28px;border-radius:6px;border:none;background:rgba(255,45,117,0.6);color:#fff;cursor:pointer;font-size:0.75rem;"><i class="fa-solid fa-trash"></i></button>
+                </div>
+              </div>
+              <div style="padding:10px;">
+                <p style="font-size:0.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${img.name || 'Untitled'}</p>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${img.description || 'Chưa có mô tả'}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
     `;
-  },
+    },
 
-  bindFormEvents() {
-    document.getElementById('profileForm')?.addEventListener('submit', (e) => { e.preventDefault(); this.saveProfile(e.target); });
-    document.getElementById('heroForm')?.addEventListener('submit', (e) => { e.preventDefault(); this.saveHero(e.target); });
-  },
+    bindFormEvents() {
+      document.getElementById('profileForm')?.addEventListener('submit', (e) => { e.preventDefault(); this.saveProfile(e.target); });
+      document.getElementById('heroForm')?.addEventListener('submit', (e) => { e.preventDefault(); this.saveHero(e.target); });
+    },
 
-  saveProfile(form) {
-    const data = new FormData(form);
-    this.config.profile = { ...this.config.profile, name: data.get('name'), nickname: data.get('nickname'), title: data.get('title'), email: data.get('email'), phone: data.get('phone'), cv: data.get('cv'), description: data.get('description') };
-    this.saveConfig();
-  },
+    saveProfile(form) {
+      const data = new FormData(form);
+      this.config.profile = { ...this.config.profile, name: data.get('name'), nickname: data.get('nickname'), title: data.get('title'), email: data.get('email'), phone: data.get('phone'), cv: data.get('cv'), description: data.get('description') };
+      this.saveConfig();
+    },
 
-  saveHero(form) {
-    const data = new FormData(form);
-    this.config.hero = { badge: data.get('badge'), titleLine1: data.get('titleLine1'), titleLine2: data.get('titleLine2'), ctaText: data.get('ctaText'), cvText: data.get('cvText') };
-    this.saveConfig();
-  },
+    saveHero(form) {
+      const data = new FormData(form);
+      this.config.hero = { badge: data.get('badge'), titleLine1: data.get('titleLine1'), titleLine2: data.get('titleLine2'), ctaText: data.get('ctaText'), cvText: data.get('cvText') };
+      this.saveConfig();
+    },
 
-  // CRUD methods for stats, skills, projects, social
-  addStat() { this.showModal('stat'); },
-  editStat(i) { this.showModal('stat', i); },
-  deleteStat(i) { this.config.stats.splice(i, 1); this.saveConfig(); this.renderSection('stats'); },
+    // CRUD methods for stats, skills, projects, social
+    addStat() { this.showModal('stat'); },
+    editStat(i) { this.showModal('stat', i); },
+    deleteStat(i) { this.config.stats.splice(i, 1); this.saveConfig(); this.renderSection('stats'); },
 
-  addSkill() { this.showModal('skill'); },
-  editSkill(i) { this.showModal('skill', i); },
-  deleteSkill(i) { this.config.skills.splice(i, 1); this.saveConfig(); this.renderSection('skills'); },
+    addSkill() { this.showModal('skill'); },
+    editSkill(i) { this.showModal('skill', i); },
+    deleteSkill(i) { this.config.skills.splice(i, 1); this.saveConfig(); this.renderSection('skills'); },
 
-  addProject() { this.showModal('project'); },
-  editProject(i) { this.showModal('project', i); },
-  deleteProject(i) { this.config.projects.splice(i, 1); this.saveConfig(); this.renderSection('projects'); },
+    addProject() { this.showModal('project'); },
+    editProject(i) { this.showModal('project', i); },
+    deleteProject(i) { this.config.projects.splice(i, 1); this.saveConfig(); this.renderSection('projects'); },
 
-  addSocial() { this.showModal('social'); },
-  editSocial(i) { this.showModal('social', i); },
-  deleteSocial(i) { this.config.social.splice(i, 1); this.saveConfig(); this.renderSection('social'); },
+    addSocial() { this.showModal('social'); },
+    editSocial(i) { this.showModal('social', i); },
+    deleteSocial(i) { this.config.social.splice(i, 1); this.saveConfig(); this.renderSection('social'); },
 
-  updateImageUrl(key, value) { this.config.images[key] = value; this.saveConfig(); },
+    // Gallery CRUD
+    addGalleryImage() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/png,image/jpeg,image/webp,image/gif';
+      input.multiple = true;
+      input.onchange = (e) => {
+        const files = Array.from(e.target.files);
+        if (!this.config.images.gallery) this.config.images.gallery = [];
+        files.forEach(file => {
+          if (file.size > 5 * 1024 * 1024) { this.toast(`${file.name} quá lớn (tối đa 5MB)`, 'error'); return; }
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            this.config.images.gallery.push({
+              id: Date.now() + Math.random(),
+              url: ev.target.result,
+              name: file.name,
+              description: '',
+              size: file.size,
+              uploadedAt: new Date().toISOString()
+            });
+            this.saveConfig();
+            this.renderSection('images');
+          };
+          reader.readAsDataURL(file);
+        });
+      };
+      input.click();
+    },
+    editGalleryImage(i) {
+      if (!this.config.images.gallery) return;
+      const img = this.config.images.gallery[i];
+      const name = prompt('Tên ảnh:', img.name || '');
+      if (name === null) return;
+      const desc = prompt('Mô tả ảnh:', img.description || '');
+      if (desc === null) return;
+      img.name = name;
+      img.description = desc;
+      this.saveConfig();
+      this.renderSection('images');
+    },
+    deleteGalleryImage(i) {
+      if (!this.config.images.gallery) return;
+      if (!confirm('Xóa ảnh này?')) return;
+      this.config.images.gallery.splice(i, 1);
+      this.saveConfig();
+      this.renderSection('images');
+    },
 
-  showModal(type, index = null) {
-    const isEdit = index !== null;
-    let content = '';
-    
-    if (type === 'stat') {
-      const s = isEdit ? this.config.stats[index] : { icon: 'fa-star', value: 0, label: '', color: '#a78bfa' };
-      content = `
+    updateImageUrl(key, value) { this.config.images[key] = value; this.saveConfig(); },
+
+    // Universal image upload - works for any field
+    uploadImage(targetField, previewId, inputId) {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/png,image/jpeg,image/webp,image/gif';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { this.toast('File quá lớn (tối đa 5MB)', 'error'); return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const dataUrl = ev.target.result;
+          // Update preview if exists
+          if (previewId) {
+            const prev = document.getElementById(previewId);
+            if (prev) { prev.src = dataUrl; prev.style.display = 'block'; }
+          }
+          // Update input if exists
+          if (inputId) {
+            const inp = document.getElementById(inputId);
+            if (inp) inp.value = dataUrl.substring(0, 50) + '... (Base64)';
+          }
+          // Store in config
+          if (targetField.includes('.')) {
+            const [section, key] = targetField.split('.');
+            if (!this.config[section]) this.config[section] = {};
+            this.config[section][key] = dataUrl;
+          } else {
+            this.config.images[targetField] = dataUrl;
+          }
+          this.saveConfig();
+          this.toast('Upload ảnh thành công!', 'success');
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    },
+
+    // Upload for modal fields (returns promise)
+    uploadModalImage(previewId, inputId) {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/png,image/jpeg,image/webp,image/gif';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { this.toast('File quá lớn (tối đa 5MB)', 'error'); return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const dataUrl = ev.target.result;
+          if (previewId) { const p = document.getElementById(previewId); if (p) { p.src = dataUrl; p.style.display = 'block'; } }
+          if (inputId) { const inp = document.getElementById(inputId); if (inp) inp.value = dataUrl; }
+          this.toast('Upload ảnh thành công!', 'success');
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    },
+
+    showModal(type, index = null) {
+      const isEdit = index !== null;
+      let content = '';
+
+      if (type === 'stat') {
+        const s = isEdit ? this.config.stats[index] : { icon: 'fa-star', value: 0, label: '', color: '#a78bfa' };
+        content = `
         <div class="form-group"><label class="form-label">Icon (FontAwesome)</label><input type="text" class="form-input" id="modalIcon" value="${s.icon}" placeholder="fa-star"></div>
         <div class="form-group"><label class="form-label">Giá trị</label><input type="number" class="form-input" id="modalValue" value="${s.value}"></div>
         <div class="form-group"><label class="form-label">Nhãn</label><input type="text" class="form-input" id="modalLabel" value="${s.label}"></div>
         <div class="form-group"><label class="form-label">Màu</label><input type="color" class="form-input" id="modalColor" value="${s.color}" style="height: 50px;"></div>
       `;
-    } else if (type === 'skill') {
-      const s = isEdit ? this.config.skills[index] : { title: '', icon: 'fa-code', tags: [], large: false };
-      content = `
+      } else if (type === 'skill') {
+        const s = isEdit ? this.config.skills[index] : { title: '', icon: 'fa-code', tags: [], large: false };
+        content = `
         <div class="form-group"><label class="form-label">Tiêu đề</label><input type="text" class="form-input" id="modalTitle" value="${s.title}"></div>
         <div class="form-group"><label class="form-label">Icon</label><input type="text" class="form-input" id="modalIcon" value="${s.icon}"></div>
         <div class="form-group"><label class="form-label">Tags (phân cách bằng dấu phẩy)</label><input type="text" class="form-input" id="modalTags" value="${s.tags.join(', ')}"></div>
         <div class="form-group"><label><input type="checkbox" id="modalLarge" ${s.large ? 'checked' : ''}> Card lớn (2 cột)</label></div>
       `;
-    } else if (type === 'project') {
-      const p = isEdit ? this.config.projects[index] : { title: '', description: '', image: '', tags: [], demo: '#', github: '#' };
-      content = `
+      } else if (type === 'project') {
+        const p = isEdit ? this.config.projects[index] : { title: '', description: '', image: '', tags: [], demo: '#', github: '#' };
+        content = `
         <div class="form-group"><label class="form-label">Tên dự án</label><input type="text" class="form-input" id="modalTitle" value="${p.title}"></div>
         <div class="form-group"><label class="form-label">Mô tả</label><textarea class="form-textarea" id="modalDesc" style="min-height: 80px;">${p.description}</textarea></div>
-        <div class="form-group"><label class="form-label">URL Ảnh</label><input type="text" class="form-input" id="modalImage" value="${p.image}"></div>
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-image"></i> Ảnh dự án</label>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <input type="text" class="form-input" id="modalImage" value="${p.image}" placeholder="URL ảnh hoặc upload" style="flex:1;min-width:200px;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="App.uploadModalImage('modalImgPrev','modalImage')" style="white-space:nowrap;"><i class="fa-solid fa-cloud-upload-alt"></i> Upload</button>
+          </div>
+          <img id="modalImgPrev" src="${p.image}" style="max-width:200px;border-radius:8px;margin-top:10px;display:${p.image ? 'block' : 'none'};" onerror="this.style.display='none'">
+        </div>
         <div class="form-group"><label class="form-label">Tags</label><input type="text" class="form-input" id="modalTags" value="${p.tags.join(', ')}"></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Link Demo</label><input type="text" class="form-input" id="modalDemo" value="${p.demo}"></div>
           <div class="form-group"><label class="form-label">Link GitHub</label><input type="text" class="form-input" id="modalGithub" value="${p.github}"></div>
         </div>
       `;
-    } else if (type === 'social') {
-      const s = isEdit ? this.config.social[index] : { name: '', icon: 'fa-brands fa-github', url: '', color: '#ffffff' };
-      content = `
-        <div class="form-group"><label class="form-label">Tên</label><input type="text" class="form-input" id="modalName" value="${s.name}"></div>
+
+      } else if (type === 'social') {
+        const s = isEdit ? this.config.social[index] : { name: '', icon: 'fa-brands fa-github', url: '', color: '#ffffff' };
+        content = `
+          < div class="form-group" ><label class="form-label">Tên</label><input type="text" class="form-input" id="modalName" value="${s.name}"></div>
         <div class="form-group"><label class="form-label">Icon</label><input type="text" class="form-input" id="modalIcon" value="${s.icon}" placeholder="fa-brands fa-github"></div>
         <div class="form-group"><label class="form-label">URL</label><input type="text" class="form-input" id="modalUrl" value="${s.url}"></div>
         <div class="form-group"><label class="form-label">Màu</label><input type="color" class="form-input" id="modalColor" value="${s.color}" style="height: 50px;"></div>
-      `;
-    }
+        `;
+      }
 
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay active';
-    modal.id = 'editModal';
-    modal.innerHTML = `
-      <div class="modal">
-        <div class="modal-header">
-          <h3>${isEdit ? 'Chỉnh sửa' : 'Thêm mới'}</h3>
-          <button class="modal-close" onclick="App.closeModal()"><i class="fa-solid fa-times"></i></button>
-        </div>
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay active';
+      modal.id = 'editModal';
+      modal.innerHTML = `
+          < div class="modal" >
+            <div class="modal-header">
+              <h3>${isEdit ? 'Chỉnh sửa' : 'Thêm mới'}</h3>
+              <button class="modal-close" onclick="App.closeModal()"><i class="fa-solid fa-times"></i></button>
+            </div>
         ${content}
         <div class="modal-actions">
           <button class="btn btn-secondary" onclick="App.closeModal()">Hủy</button>
           <button class="btn btn-primary" onclick="App.saveModal('${type}', ${index})">${isEdit ? 'Cập nhật' : 'Thêm'}</button>
         </div>
-      </div>
+      </div >
     `;
-    document.body.appendChild(modal);
-  },
+      document.body.appendChild(modal);
+    },
 
-  closeModal() { document.getElementById('editModal')?.remove(); },
+    closeModal() { document.getElementById('editModal')?.remove(); },
 
-  saveModal(type, index) {
-    if (type === 'stat') {
-      const item = { icon: document.getElementById('modalIcon').value, value: parseInt(document.getElementById('modalValue').value), label: document.getElementById('modalLabel').value, color: document.getElementById('modalColor').value };
-      if (index !== null) this.config.stats[index] = item; else this.config.stats.push(item);
-      this.saveConfig(); this.closeModal(); this.renderSection('stats');
-    } else if (type === 'skill') {
-      const item = { id: Date.now(), title: document.getElementById('modalTitle').value, icon: document.getElementById('modalIcon').value, tags: document.getElementById('modalTags').value.split(',').map(t => t.trim()), large: document.getElementById('modalLarge').checked };
-      if (index !== null) this.config.skills[index] = item; else this.config.skills.push(item);
-      this.saveConfig(); this.closeModal(); this.renderSection('skills');
-    } else if (type === 'project') {
-      const item = { id: Date.now(), title: document.getElementById('modalTitle').value, description: document.getElementById('modalDesc').value, image: document.getElementById('modalImage').value, tags: document.getElementById('modalTags').value.split(',').map(t => t.trim()), demo: document.getElementById('modalDemo').value, github: document.getElementById('modalGithub').value };
-      if (index !== null) this.config.projects[index] = item; else this.config.projects.push(item);
-      this.saveConfig(); this.closeModal(); this.renderSection('projects');
-    } else if (type === 'social') {
-      const item = { id: Date.now(), name: document.getElementById('modalName').value, icon: document.getElementById('modalIcon').value, url: document.getElementById('modalUrl').value, color: document.getElementById('modalColor').value };
-      if (index !== null) this.config.social[index] = item; else this.config.social.push(item);
-      this.saveConfig(); this.closeModal(); this.renderSection('social');
+    saveModal(type, index) {
+      if (type === 'stat') {
+        const item = { icon: document.getElementById('modalIcon').value, value: parseInt(document.getElementById('modalValue').value), label: document.getElementById('modalLabel').value, color: document.getElementById('modalColor').value };
+        if (index !== null) this.config.stats[index] = item; else this.config.stats.push(item);
+        this.saveConfig(); this.closeModal(); this.renderSection('stats');
+      } else if (type === 'skill') {
+        const item = { id: Date.now(), title: document.getElementById('modalTitle').value, icon: document.getElementById('modalIcon').value, tags: document.getElementById('modalTags').value.split(',').map(t => t.trim()), large: document.getElementById('modalLarge').checked };
+        if (index !== null) this.config.skills[index] = item; else this.config.skills.push(item);
+        this.saveConfig(); this.closeModal(); this.renderSection('skills');
+      } else if (type === 'project') {
+        const item = { id: Date.now(), title: document.getElementById('modalTitle').value, description: document.getElementById('modalDesc').value, image: document.getElementById('modalImage').value, tags: document.getElementById('modalTags').value.split(',').map(t => t.trim()), demo: document.getElementById('modalDemo').value, github: document.getElementById('modalGithub').value };
+        if (index !== null) this.config.projects[index] = item; else this.config.projects.push(item);
+        this.saveConfig(); this.closeModal(); this.renderSection('projects');
+      } else if (type === 'social') {
+        const item = { id: Date.now(), name: document.getElementById('modalName').value, icon: document.getElementById('modalIcon').value, url: document.getElementById('modalUrl').value, color: document.getElementById('modalColor').value };
+        if (index !== null) this.config.social[index] = item; else this.config.social.push(item);
+        this.saveConfig(); this.closeModal(); this.renderSection('social');
+      }
+    },
+
+    exportConfig() {
+      const data = JSON.stringify(this.config, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'portfolio-config.json'; a.click();
+      URL.revokeObjectURL(url);
+      this.toast('Đã tải file config!', 'success');
+    },
+
+    toast(msg, type = 'success') {
+      const existing = document.querySelector('.toast'); if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.className = `toast ${type} `;
+      toast.innerHTML = `< i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}" ></i > ${msg} `;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
     }
-  },
+  };
 
-  exportConfig() {
-    const data = JSON.stringify(this.config, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'portfolio-config.json'; a.click();
-    URL.revokeObjectURL(url);
-    this.toast('Đã tải file config!', 'success');
-  },
+  // Firebase Auth Check
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-  toast(msg, type = 'success') {
-    const existing = document.querySelector('.toast'); if (existing) existing.remove();
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `<i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  }
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
+    authDomain: "dbblogdev.firebaseapp.com",
+    projectId: "dbblogdev",
+    storageBucket: "dbblogdev.firebasestorage.app",
+    messagingSenderId: "363253081554",
+    appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
+  };
 
-// Firebase Auth Check
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDCls_5XeIw5LbAP7wsjcaffeG6_1sCAzY",
-  authDomain: "dbblogdev.firebaseapp.com",
-  projectId: "dbblogdev",
-  storageBucket: "dbblogdev.firebasestorage.app",
-  messagingSenderId: "363253081554",
-  appId: "1:363253081554:web:2ff3f7d3dd6371a7b1540b"
-};
-
-let firebaseApp, auth;
-try {
-  firebaseApp = initializeApp(firebaseConfig);
-  auth = getAuth(firebaseApp);
-} catch (error) {
-  console.error('Firebase init error:', error);
-  document.getElementById('authLoading').innerHTML = `
-    <div style="text-align:center;color:#ff2d75;">
+  let firebaseApp, auth;
+  try {
+    firebaseApp = initializeApp(firebaseConfig);
+    auth = getAuth(firebaseApp);
+  } catch (error) {
+    console.error('Firebase init error:', error);
+    document.getElementById('authLoading').innerHTML = `
+    < div style = "text-align:center;color:#ff2d75;" >
       <i class="fa-solid fa-exclamation-triangle" style="font-size:2rem;margin-bottom:16px;display:block;"></i>
       <p>Lỗi kết nối Firebase</p>
       <p style="font-size:0.85rem;opacity:0.7;margin-top:8px;">${error.message}</p>
       <a href="auth.html" style="color:#00ffea;margin-top:16px;display:inline-block;">Thử đăng nhập lại</a>
-    </div>
-  `;
-}
+    </div >
+    `;
+  }
 
-// Timeout after 10 seconds
-setTimeout(() => {
-  const loading = document.getElementById('authLoading');
-  if (loading && loading.style.display !== 'none') {
-    loading.innerHTML = `
-      <div style="text-align:center;color:#fbbf24;">
+  // Timeout after 10 seconds
+  setTimeout(() => {
+    const loading = document.getElementById('authLoading');
+    if (loading && loading.style.display !== 'none') {
+      loading.innerHTML = `
+    < div style = "text-align:center;color:#fbbf24;" >
         <i class="fa-solid fa-clock" style="font-size:2rem;margin-bottom:16px;display:block;"></i>
         <p>Kết nối chậm hoặc chưa bật Firebase Auth</p>
         <a href="auth.html" style="color:#00ffea;margin-top:16px;display:inline-block;">Đi đến trang đăng nhập</a>
-      </div>
+      </div >
     `;
-  }
-}, 10000);
+    }
+  }, 10000);
 
-// Check auth state
-if (auth) {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in, hide loading and init app
-      document.getElementById('authLoading').style.display = 'none';
-      App.currentUser = user;
-      App.init();
-    } else {
-      // Not signed in, redirect to login
+  // Check auth state
+  if (auth) {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, hide loading and init app
+        document.getElementById('authLoading').style.display = 'none';
+        App.currentUser = user;
+        App.init();
+      } else {
+        // Not signed in, redirect to login
+        window.location.href = 'auth.html';
+      }
+    });
+  }
+
+  // Override logout method
+  App.logout = async function () {
+    try {
+      if (auth) await signOut(auth);
+      window.location.href = 'auth.html';
+    } catch (error) {
+      console.error('Logout error:', error);
       window.location.href = 'auth.html';
     }
-  });
-}
-
-// Override logout method
-App.logout = async function() {
-  try {
-    if (auth) await signOut(auth);
-    window.location.href = 'auth.html';
-  } catch (error) {
-    console.error('Logout error:', error);
-    window.location.href = 'auth.html';
-  }
-};
+  };
 </script>
