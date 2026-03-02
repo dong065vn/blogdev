@@ -51,3 +51,6 @@ logs/
 SKILL_*.md
 vibecode-*.md
 cors.json
+
+.vercel
+.env*.local

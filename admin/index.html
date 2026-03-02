@@ -41,6 +41,8 @@
         <a href="#" class="nav-item" data-section="hero"><i class="fa-solid fa-home"></i><span>Hero Section</span></a>
         <a href="#" class="nav-item" data-section="stats"><i class="fa-solid fa-chart-bar"></i><span>Thống kê</span></a>
         <a href="#" class="nav-item" data-section="skills"><i class="fa-solid fa-code"></i><span>Kỹ năng</span></a>
+        <a href="#" class="nav-item" data-section="about"><i class="fa-solid fa-address-card"></i><span>About
+            Me</span></a>
         <a href="#" class="nav-item" data-section="projects"><i class="fa-solid fa-folder"></i><span>Dự án</span></a>
         <a href="#" class="nav-item" data-section="social"><i class="fa-solid fa-share-nodes"></i><span>Mạng xã
             hội</span></a>
@@ -996,6 +998,21 @@
       { id: 4, name: "Twitter", icon: "fa-brands fa-x-twitter", url: "#", color: "#fff" },
       { id: 5, name: "Zalo", icon: "fa-solid fa-comment", url: "https://zaloapp.com/qr/p/12v5mo2i6udrv", color: "#0068ff" }
     ],
+    about: {
+      profileText: "I'm Đông — a full-stack developer who blends clean UI, strong UX, and performance. I build fast, accessible products and love turning ideas into delightful experiences.",
+      contacts: [
+        { icon: "fa-solid fa-phone", label: "+84 372 837 802", url: "tel:+84372837802" },
+        { icon: "fa-solid fa-envelope", label: "daodong204@gmail.com", url: "mailto:daodong204@gmail.com" },
+        { icon: "fa-brands fa-facebook", label: "Facebook", url: "https://www.facebook.com/dong06.5.98.bg/" },
+        { icon: "fa-solid fa-comment", label: "Zalo", url: "https://zaloapp.com/qr/p/12v5mo2i6udrv" }
+      ],
+      expDescription: "My professional journey in web development.",
+      experience: [
+        { id: 1, year: "2024", title: "Full-stack Developer", description: "Building modern web applications with React & Node.js" },
+        { id: 2, year: "2023", title: "Frontend Developer", description: "React, Vue.js, Tailwind CSS development" },
+        { id: 3, year: "2022", title: "Web Developer", description: "HTML, CSS, JavaScript fundamentals" }
+      ]
+    },
     images: {
       avatar: "assets/avatar.jpg",
       favicon: "assets/favicon.png",
@@ -1056,7 +1073,7 @@
 
     renderSection(section) {
       this.currentSection = section;
-      const titles = { profile: 'Thông tin cá nhân', hero: 'Hero Section', stats: 'Thống kê', skills: 'Kỹ năng', projects: 'Dự án', social: 'Mạng xã hội', images: 'Hình ảnh' };
+      const titles = { profile: 'Thông tin cá nhân', hero: 'Hero Section', stats: 'Thống kê', skills: 'Kỹ năng', about: 'About Me', projects: 'Dự án', social: 'Mạng xã hội', images: 'Hình ảnh' };
       document.getElementById('pageTitle').textContent = titles[section] || section;
       const content = document.getElementById('contentArea');
 
@@ -1065,6 +1082,7 @@
         case 'hero': content.innerHTML = this.renderHero(); break;
         case 'stats': content.innerHTML = this.renderStats(); break;
         case 'skills': content.innerHTML = this.renderSkills(); break;
+        case 'about': content.innerHTML = this.renderAbout(); break;
         case 'projects': content.innerHTML = this.renderProjects(); break;
         case 'social': content.innerHTML = this.renderSocial(); break;
         case 'images': content.innerHTML = this.renderImages(); break;
@@ -1343,9 +1361,137 @@
     `;
     },
 
+    renderAbout() {
+      if (!this.config.about) {
+        this.config.about = { profileText: '', contacts: [], expDescription: '', experience: [] };
+      }
+      const a = this.config.about;
+      return `
+      <div class="card">
+        <div class="card-header"><h2 class="card-title"><i class="fa-solid fa-address-card"></i> About Me</h2></div>
+        <form id="aboutForm" class="form-grid">
+          <div class="form-group full">
+            <label class="form-label">Giới thiệu bản thân</label>
+            <textarea class="form-textarea" name="profileText" style="min-height:100px;">${a.profileText || ''}</textarea>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Mô tả kinh nghiệm</label>
+            <input type="text" class="form-input" name="expDescription" value="${a.expDescription || ''}">
+          </div>
+          <div class="form-group full" style="display:flex;gap:12px;">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Lưu thay đổi</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fa-solid fa-address-book"></i> Liên hệ</h2>
+          <button class="btn btn-secondary btn-sm" onclick="App.addContact()"><i class="fa-solid fa-plus"></i> Thêm</button>
+        </div>
+        <div id="contactsList">
+          ${(a.contacts || []).map((c, i) => `
+            <div class="list-item">
+              <div class="list-item-icon" style="background:rgba(0,180,255,0.15);color:var(--iris-blue);"><i class="${c.icon}"></i></div>
+              <div class="list-item-content">
+                <h4>${c.label}</h4>
+                <p>${c.url}</p>
+              </div>
+              <div class="list-item-actions">
+                <button onclick="App.editContact(${i})"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-delete" onclick="App.deleteContact(${i})"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fa-solid fa-briefcase"></i> Kinh nghiệm</h2>
+          <button class="btn btn-secondary btn-sm" onclick="App.addExperience()"><i class="fa-solid fa-plus"></i> Thêm</button>
+        </div>
+        <div id="expList">
+          ${(a.experience || []).map((exp, i) => `
+            <div class="list-item">
+              <div class="list-item-icon" style="background:rgba(177,74,237,0.15);color:var(--iris-purple);font-weight:700;font-size:0.85rem;">${exp.year}</div>
+              <div class="list-item-content">
+                <h4>${exp.title}</h4>
+                <p>${exp.description}</p>
+              </div>
+              <div class="list-item-actions">
+                <button onclick="App.editExperience(${i})"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-delete" onclick="App.deleteExperience(${i})"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    },
+
+    saveAbout(form) {
+      const data = new FormData(form);
+      if (!this.config.about) this.config.about = {};
+      this.config.about.profileText = data.get('profileText');
+      this.config.about.expDescription = data.get('expDescription');
+      this.saveConfig();
+    },
+
+    // Contact CRUD
+    addContact() {
+      const icon = prompt('Icon (FontAwesome class):', 'fa-solid fa-globe');
+      if (!icon) return;
+      const label = prompt('Label:', '');
+      if (!label) return;
+      const url = prompt('URL:', '#');
+      if (!this.config.about) this.config.about = { contacts: [] };
+      if (!this.config.about.contacts) this.config.about.contacts = [];
+      this.config.about.contacts.push({ icon, label, url: url || '#' });
+      this.saveConfig(); this.renderSection('about');
+    },
+    editContact(i) {
+      const c = this.config.about.contacts[i];
+      const icon = prompt('Icon:', c.icon); if (icon === null) return;
+      const label = prompt('Label:', c.label); if (label === null) return;
+      const url = prompt('URL:', c.url); if (url === null) return;
+      c.icon = icon; c.label = label; c.url = url;
+      this.saveConfig(); this.renderSection('about');
+    },
+    deleteContact(i) {
+      if (!confirm('Xóa liên hệ này?')) return;
+      this.config.about.contacts.splice(i, 1);
+      this.saveConfig(); this.renderSection('about');
+    },
+
+    // Experience CRUD
+    addExperience() {
+      const year = prompt('Năm:', new Date().getFullYear().toString());
+      if (!year) return;
+      const title = prompt('Chức danh:', '');
+      if (!title) return;
+      const desc = prompt('Mô tả:', '');
+      if (!this.config.about) this.config.about = { experience: [] };
+      if (!this.config.about.experience) this.config.about.experience = [];
+      this.config.about.experience.push({ id: Date.now(), year, title, description: desc || '' });
+      this.saveConfig(); this.renderSection('about');
+    },
+    editExperience(i) {
+      const exp = this.config.about.experience[i];
+      const year = prompt('Năm:', exp.year); if (year === null) return;
+      const title = prompt('Chức danh:', exp.title); if (title === null) return;
+      const desc = prompt('Mô tả:', exp.description); if (desc === null) return;
+      exp.year = year; exp.title = title; exp.description = desc;
+      this.saveConfig(); this.renderSection('about');
+    },
+    deleteExperience(i) {
+      if (!confirm('Xóa kinh nghiệm này?')) return;
+      this.config.about.experience.splice(i, 1);
+      this.saveConfig(); this.renderSection('about');
+    },
+
     bindFormEvents() {
       document.getElementById('profileForm')?.addEventListener('submit', (e) => { e.preventDefault(); this.saveProfile(e.target); });
       document.getElementById('heroForm')?.addEventListener('submit', (e) => { e.preventDefault(); this.saveHero(e.target); });
+      document.getElementById('aboutForm')?.addEventListener('submit', (e) => { e.preventDefault(); this.saveAbout(e.target); });
     },
 
     saveProfile(form) {
