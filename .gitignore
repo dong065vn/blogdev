@@ -52,5 +52,17 @@ SKILL_*.md
 vibecode-*.md
 cors.json
 
-.vercel
-.env*.local
+# =========================
+# Không liên quan / Local tools
+# =========================
+fontawesome-free-7.0.1-web/
+ngrok/
+ngrok.zip
+api/
+.shared/
+.vscode/
+vibe-coding-*/
+docs/*.sql
+docs/sqlserver-guide.md
+CV-29925-*.png
+
